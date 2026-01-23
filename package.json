@@ -1,8 +1,9 @@
 {
-  "name": "projeto-seplag",
+  "name": "petmanager-seplag",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "description": "Sistema de Gestão de Pets e Tutores - Projeto SEPLAG",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -12,10 +13,12 @@
   "dependencies": {
     "axios": "^1.13.2",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^24.10.9",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
