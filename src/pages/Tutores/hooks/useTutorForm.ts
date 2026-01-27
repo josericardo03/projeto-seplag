@@ -224,7 +224,7 @@ export function useTutorForm() {
 
       if (!mountedRef.current) return
       setSuccess(mode === 'edit' ? 'Tutor atualizado com sucesso' : 'Tutor cadastrado com sucesso')
-      setTimeout(() => navigate(`/tutores/${saved.id}`), 500)
+      setTimeout(() => navigate(`/tutores/${saved.id}/editar`), 500)
     } catch (e: any) {
       if (!mountedRef.current) return
       setError(e?.response?.data?.message || e?.message || 'Erro ao salvar tutor')

@@ -9,7 +9,7 @@ import {
   EmptyState,
   InlineCount,
 } from './components/list/States'
-import { FullPageAuthError, FullPageSpinner, RenderError } from './components/shared/PageStates'
+import { FullPageSpinner, RenderError } from './components/shared/PageStates'
 import { usePetsList } from './hooks/usePetsList'
 
 export default function PetsList() {
@@ -34,18 +34,8 @@ export default function PetsList() {
     reload,
   } = usePetsList({ pageSize: 10, pollingMs: 10_000 })
 
-  if (authLoading) return <FullPageSpinner label="Carregando autenticação..." />
-
-  if (!isAuthenticated) {
-    return (
-      <FullPageAuthError
-        onRetry={() => {
-          localStorage.clear()
-          window.location.reload()
-        }}
-      />
-    )
-  }
+  if (authLoading) return <FullPageSpinner label="Carregando..." />
+  if (!isAuthenticated) return null
 
   try {
     return (

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { PetsHeader } from './components/shared/PetsHeader'
-import { FullPageAuthError, FullPageSpinner, RenderError } from './components/shared/PageStates'
+import { FullPageSpinner, RenderError } from './components/shared/PageStates'
 import { usePetDetails } from './hooks/usePetDetails'
 import { SpeciesBadge } from './components/details/SpeciesBadge'
 import { PetMediaCard } from './components/details/PetMediaCard'
@@ -10,18 +10,8 @@ import { TutorCard } from './components/details/TutorCard'
 export default function PetDetails() {
   const { authLoading, isAuthenticated, loading, error, pet, tutores } = usePetDetails()
 
-  if (authLoading) return <FullPageSpinner label="Carregando autenticação..." />
-
-  if (!isAuthenticated) {
-    return (
-      <FullPageAuthError
-        onRetry={() => {
-          localStorage.clear()
-          window.location.reload()
-        }}
-      />
-    )
-  }
+  if (authLoading) return <FullPageSpinner label="Carregando..." />
+  if (!isAuthenticated) return null
 
   if (loading) return <FullPageSpinner label="Carregando informações..." />
 

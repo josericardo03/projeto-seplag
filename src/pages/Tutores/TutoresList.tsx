@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { PetsHeader } from '../Pets/components/shared/PetsHeader'
-import { FullPageAuthError, FullPageSpinner } from '../Pets/components/shared/PageStates'
+import { FullPageSpinner } from '../Pets/components/shared/PageStates'
 import { useTutoresList } from './hooks/useTutoresList'
 import { TutorCard } from './components/TutorCard'
 import { Pagination } from './components/Pagination'
@@ -25,18 +25,8 @@ export default function TutoresList() {
     emptyMessage,
   } = useTutoresList({ pageSize: 10, pollingMs: 10_000 })
 
-  if (authLoading) return <FullPageSpinner label="Carregando autenticação..." />
-
-  if (!isAuthenticated) {
-    return (
-      <FullPageAuthError
-        onRetry={() => {
-          localStorage.clear()
-          window.location.reload()
-        }}
-      />
-    )
-  }
+  if (authLoading) return <FullPageSpinner label="Carregando..." />
+  if (!isAuthenticated) return null
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-200">

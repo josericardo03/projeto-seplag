@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { PetsHeader } from '../Pets/components/shared/PetsHeader'
-import { FullPageAuthError, FullPageSpinner, RenderError } from '../Pets/components/shared/PageStates'
+import { FullPageSpinner, RenderError } from '../Pets/components/shared/PageStates'
 import { Field } from '../Pets/components/form/Field'
 import { NumberLikeInput, TextInput } from '../Pets/components/form/Inputs'
 import { FormActions } from '../Pets/components/form/FormActions'
@@ -47,18 +47,8 @@ export default function TutorForm() {
     cancel,
   } = useTutorForm()
 
-  if (authLoading) return <FullPageSpinner label="Carregando autenticação..." />
-
-  if (!isAuthenticated) {
-    return (
-      <FullPageAuthError
-        onRetry={() => {
-          localStorage.clear()
-          window.location.reload()
-        }}
-      />
-    )
-  }
+  if (authLoading) return <FullPageSpinner label="Carregando..." />
+  if (!isAuthenticated) return null
 
   if (initialLoading) return <FullPageSpinner label="Carregando tutor..." />
 
@@ -84,7 +74,7 @@ export default function TutorForm() {
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
         <div className="mb-2">
-          <Link to="/tutores" className="inline-flex items-center text-sm text-slate-600 hover:text-indigo-600">
+          <Link to="/lobby" className="inline-flex items-center text-sm text-slate-600 hover:text-indigo-600">
             ← Voltar
           </Link>
           <h1 className="mt-4 text-3xl sm:text-4xl font-extrabold text-slate-900">

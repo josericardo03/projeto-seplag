@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { authService } from './authService'
+import { clearTokens, getAccessToken, getRefreshToken, isRefreshValid } from './tokenStorage'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://pet-manager-api.geia.vip'
 
@@ -11,7 +13,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token')
+    const token = getAccessToken()
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -32,24 +34,17 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
-      const refreshToken = localStorage.getItem('refresh_token')
-      if (refreshToken) {
+      const refreshToken = getRefreshToken()
+      if (refreshToken && isRefreshValid()) {
         try {
-          const response = await axios.put(
-            `${API_BASE_URL}/autenticacao/refresh`,
-            { refresh_token: refreshToken }
-          )
-          const { access_token, refresh_token: newRefreshToken } = response.data
-          localStorage.setItem('access_token', access_token)
-          localStorage.setItem('refresh_token', newRefreshToken)
-
+          const response = await authService.refreshToken(refreshToken)
+          const { access_token } = response
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${access_token}`
           }
           return api(originalRequest)
         } catch (refreshError) {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('refresh_token')
+          clearTokens()
           return Promise.reject(refreshError)
         }
       }
