@@ -25,18 +25,12 @@ export const petService = {
         `/v1/pets?${queryParams.toString()}`
       )
       
-      // Garantir que a resposta está no formato esperado
       if (!response.data) {
         throw new Error('Resposta da API está vazia')
       }
       
       const data = response.data
       
-      console.log('📦 Resposta bruta da API:', data)
-      
-      // Adaptar formato da API para o formato esperado
-      // API retorna: { page, size, total, pageCount, content }
-      // Precisamos: { number, size, totalElements, totalPages, content }
       const adaptedResponse: PageableResponse<Pet> = {
         content: data.content || [],
         totalElements: data.total ?? data.totalElements ?? 0,
@@ -46,17 +40,8 @@ export const petService = {
         first: (data.page ?? page) === 0,
         last: (data.page ?? page) >= ((data.pageCount ?? data.totalPages ?? 1) - 1),
       }
-      
-      console.log('✅ Resposta adaptada:', adaptedResponse)
-      
       return adaptedResponse
     } catch (error: any) {
-      console.error('Erro ao buscar pets:', error)
-      console.error('Detalhes do erro:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      })
       throw error
     }
   },
@@ -78,7 +63,7 @@ export const petService = {
 
   async uploadPhoto(petId: number, file: File): Promise<void> {
     const formData = new FormData()
-    formData.append('file', file)
+    formData.append('foto', file)
     
     await api.post(`/v1/pets/${petId}/fotos`, formData, {
       headers: {

@@ -1,4 +1,3 @@
-// Tipos para Pet
 export interface Foto {
   id: number
   nome: string
@@ -16,7 +15,6 @@ export interface Pet {
   tutorId?: number
 }
 
-// Tipos para Tutor
 export interface Tutor {
   id: number
   nome: string
@@ -25,7 +23,6 @@ export interface Tutor {
   foto?: string
 }
 
-// Tipos para resposta paginada
 export interface PageableResponse<T> {
   content: T[]
   totalElements?: number
@@ -39,7 +36,6 @@ export interface PageableResponse<T> {
   last?: boolean
 }
 
-// Tipos para autenticação
 export interface LoginRequest {
   username: string
   password: string

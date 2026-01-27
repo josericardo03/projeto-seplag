@@ -13,7 +13,6 @@ export function useAuth() {
     const initializeAuth = async () => {
       try {
         console.log('🔍 Verificando se já existe token...')
-        // Verificar se já existe token válido
         if (authService.isAuthenticated()) {
           console.log('✅ Token encontrado no localStorage')
           if (isMounted) {
@@ -25,7 +24,6 @@ export function useAuth() {
         }
 
         console.log('❌ Token não encontrado, fazendo login automático...')
-        // Fazer login automático com credenciais padrão
         try {
           console.log('📤 Enviando requisição de login...')
           const loginResponse = await authService.login({

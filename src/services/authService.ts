@@ -15,7 +15,6 @@ export const authService = {
         hasRefreshToken: !!response.data.refresh_token,
       })
       
-      // Salvar tokens no localStorage
       if (response.data.access_token) {
         localStorage.setItem('access_token', response.data.access_token)
       }
@@ -41,7 +40,6 @@ export const authService = {
       { refresh_token: refreshToken } as RefreshTokenRequest
     )
     
-    // Atualizar tokens no localStorage
     localStorage.setItem('access_token', response.data.access_token)
     localStorage.setItem('refresh_token', response.data.refresh_token)
     
