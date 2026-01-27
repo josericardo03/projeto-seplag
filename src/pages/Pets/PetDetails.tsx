@@ -8,7 +8,7 @@ import { PetInfoCard } from './components/details/PetInfoCard'
 import { TutorCard } from './components/details/TutorCard'
 
 export default function PetDetails() {
-  const { authLoading, isAuthenticated, loading, error, pet, tutor } = usePetDetails()
+  const { authLoading, isAuthenticated, loading, error, pet, tutores } = usePetDetails()
 
   if (authLoading) return <FullPageSpinner label="Carregando autenticação..." />
 
@@ -71,7 +71,14 @@ export default function PetDetails() {
 
             <PetInfoCard pet={pet} />
 
-            {tutor && <TutorCard tutor={tutor} />}
+            {tutores.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-lg font-extrabold text-slate-900">Tutores vinculados</h2>
+                {tutores.map((t) => (
+                  <TutorCard key={t.id} tutor={t} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </main>

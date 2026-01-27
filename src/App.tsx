@@ -6,6 +6,7 @@ const PetsList = lazy(() => import('./pages/Pets/PetsList'))
 const PetDetails = lazy(() => import('./pages/Pets/PetDetails'))
 const PetForm = lazy(() => import('./pages/Pets/PetForm'))
 const TutoresList = lazy(() => import('./pages/Tutores/TutoresList'))
+const TutorForm = lazy(() => import('./pages/Tutores/TutorForm'))
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
           <Route path="/pets/novo" element={<PetForm />} />
           <Route path="/pets/:id/editar" element={<PetForm />} />
           <Route path="/tutores" element={<TutoresList />} />
+          <Route path="/tutores/novo" element={<TutorForm />} />
+          <Route path="/tutores/:id/editar" element={<TutorForm />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

@@ -12,6 +12,7 @@ export function TutorCard({ tutor }: { tutor: Tutor }) {
 
         <div className="flex flex-col">
           <span className="font-semibold text-slate-800">{tutor.nome}</span>
+          {tutor.email && <span className="text-sm text-slate-600">{tutor.email}</span>}
           {tutor.telefone && <span className="text-sm text-slate-600">{tutor.telefone}</span>}
           {tutor.endereco && <span className="text-sm text-slate-600">{tutor.endereco}</span>}
         </div>

@@ -13,14 +13,18 @@ export interface Pet {
   raca?: string
   foto?: Foto | null
   tutorId?: number
+  tutores?: Tutor[]
 }
 
 export interface Tutor {
   id: number
   nome: string
+  email?: string
   telefone?: string
   endereco?: string
-  foto?: string
+  cpf?: number
+  foto?: Foto | string | null
+  pets?: Pet[]
 }
 
 export interface PageableResponse<T> {
