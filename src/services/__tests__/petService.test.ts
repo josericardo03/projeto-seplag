@@ -41,5 +41,11 @@ describe('petService', () => {
     expect(api.put).toHaveBeenCalledWith('/v1/pets/10', { idade: 4 })
     expect(res.id).toBe(10)
   })
+
+  it('deletePet faz DELETE em /v1/pets/:id', async () => {
+    ;(api.delete as any).mockResolvedValueOnce({ data: {} })
+    await petService.deletePet(99)
+    expect(api.delete).toHaveBeenCalledWith('/v1/pets/99')
+  })
 })
 

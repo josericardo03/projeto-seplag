@@ -9,6 +9,8 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 15000,
+  timeoutErrorMessage: 'Tempo limite excedido ao conectar na API',
 })
 
 api.interceptors.request.use(
@@ -24,6 +26,13 @@ api.interceptors.request.use(
   }
 )
 
+let refreshPromise: Promise<string> | null = null
+
+function isAuthEndpoint(url?: string) {
+  if (!url) return false
+  return url.includes('/autenticacao/login') || url.includes('/autenticacao/refresh')
+}
+
 api.interceptors.response.use(
   (response) => {
     return response
@@ -31,14 +40,27 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isAuthEndpoint(originalRequest.url)
+    ) {
       originalRequest._retry = true
 
       const refreshToken = getRefreshToken()
       if (refreshToken && isRefreshValid()) {
         try {
-          const response = await authService.refreshToken(refreshToken)
-          const { access_token } = response
+          if (!refreshPromise) {
+            refreshPromise = authService
+              .refreshToken(refreshToken)
+              .then((r) => r.access_token)
+              .finally(() => {
+                refreshPromise = null
+              })
+          }
+
+          const access_token = await refreshPromise
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${access_token}`
           }

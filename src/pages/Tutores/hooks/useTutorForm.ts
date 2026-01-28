@@ -23,13 +23,10 @@ export function useTutorForm() {
   const snap = useBehaviorSubjectValue(store.subject)
 
   useEffect(() => {
-    store.reset(mode, tutorId)
-    if (mode === 'edit' && tutorId && isAuthenticated && !authLoading) {
-      void store.loadTutor(tutorId)
-    }
+    const shouldLoad = mode === 'edit' && !!tutorId && isAuthenticated && !authLoading
+    store.reset(mode, tutorId, shouldLoad)
+    if (shouldLoad && tutorId) void store.loadTutor(tutorId)
   }, [store, mode, tutorId, isAuthenticated, authLoading])
-
-  useEffect(() => () => store.dispose(), [store])
 
   return {
     mode,
@@ -39,6 +36,7 @@ export function useTutorForm() {
     initialLoading: snap.initialLoading,
     saving: snap.saving,
     linking: snap.linking,
+    deleting: snap.deleting,
     error: snap.error,
     success: snap.success,
     fieldErrors: snap.fieldErrors,
@@ -70,6 +68,7 @@ export function useTutorForm() {
     unlinkPetByInput: store.unlinkPetByInput,
 
     submit: () => store.submit((path) => navigate(path)),
+    deleteTutor: () => store.deleteTutor((path) => navigate(path)),
     cancel: () => navigate('/tutores'),
   }
 }

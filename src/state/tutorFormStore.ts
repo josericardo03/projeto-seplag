@@ -11,6 +11,7 @@ export type TutorFormState = {
   initialLoading: boolean
   saving: boolean
   linking: boolean
+  deleting: boolean
   removingPhoto: boolean
   error: string | null
   success: string | null
@@ -60,6 +61,16 @@ function coerceTutorPhoto(tutor: Tutor | any): { id: number | null; url: string 
   return { id: null, url: null }
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const id = window.setTimeout(() => reject(new Error(message)), ms)
+    promise
+      .then((v) => resolve(v))
+      .catch((e) => reject(e))
+      .finally(() => window.clearTimeout(id))
+  })
+}
+
 export function createTutorFormStore() {
   const subject = new BehaviorSubject<TutorFormState>({
     mode: 'create',
@@ -67,6 +78,7 @@ export function createTutorFormStore() {
     initialLoading: false,
     saving: false,
     linking: false,
+    deleting: false,
     removingPhoto: false,
     error: null,
     success: null,
@@ -84,20 +96,18 @@ export function createTutorFormStore() {
     petIdText: '',
   })
 
-  let alive = true
-
   function set(patch: Partial<TutorFormState>) {
-    if (!alive) return
     subject.next({ ...subject.getValue(), ...patch })
   }
 
-  function reset(mode: Mode, tutorId: number | null) {
+  function reset(mode: Mode, tutorId: number | null, initialLoading = false) {
     set({
       mode,
       tutorId,
-      initialLoading: mode === 'edit',
+      initialLoading,
       saving: false,
       linking: false,
+      deleting: false,
       removingPhoto: false,
       error: null,
       success: null,
@@ -162,7 +172,11 @@ export function createTutorFormStore() {
   async function loadTutor(tutorId: number) {
     try {
       set({ initialLoading: true, error: null })
-      const tutor = await tutorService.getTutorById(tutorId)
+      const tutor = await withTimeout(
+        tutorService.getTutorById(tutorId),
+        12000,
+        'Demorando para carregar o tutor. Verifique sua conexão e tente novamente.'
+      )
       const photo = coerceTutorPhoto(tutor)
 
       set({
@@ -240,6 +254,20 @@ export function createTutorFormStore() {
       set({ error: e?.response?.data?.message || e?.message || 'Erro ao salvar tutor' })
     } finally {
       set({ saving: false })
+    }
+  }
+
+  async function deleteTutor(navigateTo: (path: string) => void) {
+    const s = subject.getValue()
+    if (!s.tutorId) return
+    try {
+      set({ deleting: true, error: null, success: null })
+      await tutorService.deleteTutor(s.tutorId)
+      navigateTo('/tutores')
+    } catch (e: any) {
+      set({ error: e?.response?.data?.message || e?.message || 'Erro ao excluir tutor' })
+    } finally {
+      set({ deleting: false })
     }
   }
 
@@ -332,10 +360,6 @@ export function createTutorFormStore() {
     set({ petIdText: '' })
   }
 
-  function dispose() {
-    alive = false
-  }
-
   return {
     subject,
     reset,
@@ -349,10 +373,10 @@ export function createTutorFormStore() {
     removeExistingPhoto,
     setPetIdText: (value: string) => set({ petIdText: value }),
     submit,
+    deleteTutor,
     linkPet,
     unlinkPet,
     unlinkPetByInput,
-    dispose,
   } as const
 }
 

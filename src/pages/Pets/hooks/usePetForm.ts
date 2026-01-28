@@ -24,13 +24,10 @@ export function usePetForm() {
   const snap = useBehaviorSubjectValue(store.subject)
 
   useEffect(() => {
-    store.reset(mode, petId)
-    if (mode === 'edit' && petId && isAuthenticated && !authLoading) {
-      void store.loadPet(petId)
-    }
+    const shouldLoad = mode === 'edit' && !!petId && isAuthenticated && !authLoading
+    store.reset(mode, petId, shouldLoad)
+    if (shouldLoad && petId) void store.loadPet(petId)
   }, [store, mode, petId, isAuthenticated, authLoading])
-
-  useEffect(() => () => store.dispose(), [store])
 
   return {
     mode,

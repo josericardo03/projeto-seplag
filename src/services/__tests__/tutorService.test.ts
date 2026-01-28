@@ -45,5 +45,11 @@ describe('tutorService', () => {
     expect(api.post).toHaveBeenCalledWith('/v1/tutores/1/pets/2')
     expect(api.delete).toHaveBeenCalledWith('/v1/tutores/1/pets/2')
   })
+
+  it('deleteTutor faz DELETE em /v1/tutores/:id', async () => {
+    ;(api.delete as any).mockResolvedValueOnce({ data: {} })
+    await tutorService.deleteTutor(123)
+    expect(api.delete).toHaveBeenCalledWith('/v1/tutores/123')
+  })
 })
 

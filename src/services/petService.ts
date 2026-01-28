@@ -71,4 +71,8 @@ export const petService = {
       },
     })
   },
+
+  async deletePet(id: number): Promise<void> {
+    await api.delete(`/v1/pets/${id}`)
+  },
 }

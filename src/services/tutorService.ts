@@ -83,4 +83,8 @@ export const tutorService = {
   async unlinkPet(tutorId: number, petId: number): Promise<void> {
     await api.delete(`/v1/tutores/${tutorId}/pets/${petId}`)
   },
+
+  async deleteTutor(id: number): Promise<void> {
+    await api.delete(`/v1/tutores/${id}`)
+  },
 }

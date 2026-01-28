@@ -12,7 +12,7 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
 
-  const from = (location.state as any)?.from?.pathname || '/lobby'
+  const from = (location.state as any)?.from?.pathname || '/'
 
   if (!isLoading && isAuthenticated) return <Navigate to={from} replace />
 
@@ -96,9 +96,6 @@ export default function Login() {
           </button>
         </div>
 
-        <p className="mt-6 text-xs text-slate-500">
-          Por segurança, não compartilhe tokens/senhas e não versiona arquivos `.env`.
-        </p>
       </div>
     </div>
   )

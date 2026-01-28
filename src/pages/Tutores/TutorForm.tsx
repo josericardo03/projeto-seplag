@@ -17,6 +17,7 @@ export default function TutorForm() {
     initialLoading,
     saving,
     linking,
+    deleting,
     error,
     success,
     fieldErrors,
@@ -44,6 +45,7 @@ export default function TutorForm() {
     unlinkPet,
     unlinkPetByInput,
     submit,
+    deleteTutor,
     cancel,
   } = useTutorForm()
 
@@ -166,7 +168,30 @@ export default function TutorForm() {
             />
           </div>
 
-          <FormActions mode={mode} saving={saving} onCancel={cancel} onSubmit={submit} />
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+            <FormActions
+              mode={mode}
+              saving={saving}
+              onCancel={cancel}
+              onSubmit={submit}
+              disabled={linking || removingPhoto || deleting}
+            />
+
+            {mode === 'edit' && tutorId && (
+              <button
+                type="button"
+                onClick={() => {
+                  const ok = window.confirm('Tem certeza que deseja excluir este tutor? Essa ação não pode ser desfeita.')
+                  if (!ok) return
+                  void deleteTutor()
+                }}
+                disabled={saving || linking || removingPhoto || deleting}
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-red-600 text-white font-semibold shadow-sm hover:bg-red-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {deleting ? 'Excluindo...' : 'Excluir tutor'}
+              </button>
+            )}
+          </div>
         </div>
 
         {mode === 'edit' && tutorId && (

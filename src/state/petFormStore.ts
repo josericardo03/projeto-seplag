@@ -38,6 +38,16 @@ function idadeNumberFromText(text: string) {
   return clamp(n, 0, 80)
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const id = window.setTimeout(() => reject(new Error(message)), ms)
+    promise
+      .then((v) => resolve(v))
+      .catch((e) => reject(e))
+      .finally(() => window.clearTimeout(id))
+  })
+}
+
 export function createPetFormStore() {
   const subject = new BehaviorSubject<PetFormState>({
     mode: 'create',
@@ -55,18 +65,15 @@ export function createPetFormStore() {
     photoFile: null,
   })
 
-  let alive = true
-
   function set(patch: Partial<PetFormState>) {
-    if (!alive) return
     subject.next({ ...subject.getValue(), ...patch })
   }
 
-  function reset(mode: Mode, petId: number | null) {
+  function reset(mode: Mode, petId: number | null, initialLoading = false) {
     set({
       mode,
       petId,
-      initialLoading: mode === 'edit',
+      initialLoading,
       saving: false,
       error: null,
       success: null,
@@ -83,7 +90,11 @@ export function createPetFormStore() {
   async function loadPet(petId: number) {
     try {
       set({ initialLoading: true, error: null })
-      const pet = await petService.getPetById(petId)
+      const pet = await withTimeout(
+        petService.getPetById(petId),
+        12000,
+        'Demorando para carregar o pet. Verifique sua conexão e tente novamente.'
+      )
       set({
         nome: pet.nome || '',
         especie: pet.especie || '',
@@ -155,10 +166,6 @@ export function createPetFormStore() {
     }
   }
 
-  function dispose() {
-    alive = false
-  }
-
   return {
     subject,
     reset,
@@ -169,7 +176,6 @@ export function createPetFormStore() {
     onChangeIdade,
     onPickPhoto: (file: File | null) => set({ photoFile: file }),
     submit,
-    dispose,
   } as const
 }
 
