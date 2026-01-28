@@ -74,7 +74,7 @@ export default function TutorForm() {
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
         <div className="mb-2">
-          <Link to="/lobby" className="inline-flex items-center text-sm text-slate-600 hover:text-indigo-600">
+          <Link to="/tutores" className="inline-flex items-center text-sm text-slate-600 hover:text-indigo-600">
             ← Voltar
           </Link>
           <h1 className="mt-4 text-3xl sm:text-4xl font-extrabold text-slate-900">

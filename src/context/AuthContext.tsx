@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { authService } from '../services/authService'
-import { clearTokens, getRefreshToken, isAccessValid, isRefreshValid, readTokens } from '../services/tokenStorage'
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
+import { authStore, type AuthState as AuthSnapshot } from '../state/authStore'
+import { useBehaviorSubjectValue } from '../state/useBehaviorSubject'
 
-type AuthState = {
+type AuthContextValue = {
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
@@ -12,80 +12,29 @@ type AuthState = {
   refresh: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthState | null>(null)
+const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const snap = useBehaviorSubjectValue<AuthSnapshot>(authStore.subject)
 
-  const syncFromStorage = useCallback(() => {
-    const ok = isAccessValid()
-    setIsAuthenticated(ok)
-  }, [])
-
-  const refresh = useCallback(async () => {
-    const refreshToken = getRefreshToken()
-    if (!refreshToken || !isRefreshValid()) {
-      clearTokens()
-      setIsAuthenticated(false)
-      return
-    }
-    await authService.refreshToken(refreshToken)
-    syncFromStorage()
-  }, [syncFromStorage])
-
-  const login = useCallback(
-    async (username: string, password: string) => {
-      setError(null)
-      await authService.login({ username, password })
-      syncFromStorage()
-    },
-    [syncFromStorage]
-  )
-
-  const logout = useCallback(() => {
-    authService.logout()
-    setIsAuthenticated(false)
-  }, [])
+  const login = useCallback((username: string, password: string) => authStore.login(username, password), [])
+  const logout = useCallback(() => authStore.logout(), [])
+  const refresh = useCallback(() => authStore.refresh(), [])
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        setIsLoading(true)
-        setError(null)
-        const tokens = readTokens()
-        if (tokens && isAccessValid()) {
-          setIsAuthenticated(true)
-          return
-        }
-        if (tokens && isRefreshValid()) {
-          await refresh()
-          return
-        }
-        clearTokens()
-        setIsAuthenticated(false)
-      } catch (e: any) {
-        clearTokens()
-        setIsAuthenticated(false)
-        setError(e?.message || 'Erro ao autenticar')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    void init()
-  }, [refresh])
+    void authStore.init()
+  }, [])
 
-  const value = useMemo<AuthState>(
+  const value = useMemo<AuthContextValue>(
     () => ({
-      isAuthenticated,
-      isLoading,
-      error,
+      isAuthenticated: snap.isAuthenticated,
+      isLoading: snap.isLoading,
+      error: snap.error,
       login,
       logout,
       refresh,
     }),
-    [isAuthenticated, isLoading, error, login, logout, refresh]
+    [snap.isAuthenticated, snap.isLoading, snap.error, login, logout, refresh]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

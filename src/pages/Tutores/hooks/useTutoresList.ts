@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { Tutor } from '../../../types'
-import type { PageableResponse } from '../../../types'
-import { tutorService, type TutorListParams } from '../../../services/tutorService'
+import { useEffect, useMemo } from 'react'
 import { useAuth } from '../../../hooks/useAuth'
+import { tutoresListStore } from '../../../state/tutoresListStore'
+import { useBehaviorSubjectValue } from '../../../state/useBehaviorSubject'
 
 export interface UseTutoresListOptions {
   pageSize?: number
@@ -10,133 +9,41 @@ export interface UseTutoresListOptions {
 }
 
 export function useTutoresList(options: UseTutoresListOptions = {}) {
-  const pageSize = options.pageSize ?? 10
-  const pollingMs = options.pollingMs ?? 10_000
-
   const { isAuthenticated, isLoading: authLoading } = useAuth()
-
-  const [tutores, setTutores] = useState<Tutor[]>([])
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const [searchTerm, setSearchTerm] = useState('')
-  const [appliedSearchTerm, setAppliedSearchTerm] = useState('')
-
-  const [currentPage, setCurrentPage] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [totalElements, setTotalElements] = useState(0)
-
-  const hasDataRef = useRef(false)
-  useEffect(() => {
-    if (tutores.length > 0) hasDataRef.current = true
-  }, [tutores.length])
-
-  const fetch = useCallback(
-    async (page: number, nome?: string) => {
-      const params: TutorListParams = {
-        page,
-        size: pageSize,
-        ...(nome && nome.trim() && { nome: nome.trim() }),
-      }
-      const response: PageableResponse<Tutor> = await tutorService.getTutores(params)
-      setTutores(response.content || [])
-      setTotalPages(response.totalPages || 0)
-      setTotalElements(response.totalElements || 0)
-      setCurrentPage(response.number || 0)
-    },
-    [pageSize]
-  )
-
-  const loadPage = useCallback(
-    async (page: number, mode: 'full' | 'soft' = 'full') => {
-      try {
-        const soft = mode === 'soft' && hasDataRef.current
-        if (soft) setRefreshing(true)
-        else setLoading(true)
-        setError(null)
-        await fetch(page, appliedSearchTerm || undefined)
-      } catch (e: any) {
-        setTutores([])
-        setTotalPages(0)
-        setTotalElements(0)
-        setCurrentPage(0)
-        setError(e?.response?.data?.message || e?.message || 'Erro ao carregar tutores')
-      } finally {
-        setLoading(false)
-        setRefreshing(false)
-      }
-    },
-    [appliedSearchTerm, fetch]
-  )
-
-  const search = useCallback(async () => {
-    const term = searchTerm.trim()
-    setAppliedSearchTerm(term)
-    setCurrentPage(0)
-    try {
-      setLoading(true)
-      setError(null)
-      await fetch(0, term || undefined)
-    } catch (e: any) {
-      setTutores([])
-      setTotalPages(0)
-      setTotalElements(0)
-      setCurrentPage(0)
-      setError(e?.response?.data?.message || e?.message || 'Erro ao buscar tutores')
-    } finally {
-      setLoading(false)
-    }
-  }, [fetch, searchTerm])
-
-  const clearSearch = useCallback(async () => {
-    setSearchTerm('')
-    setAppliedSearchTerm('')
-    setCurrentPage(0)
-    await loadPage(0)
-  }, [loadPage])
-
-  const goToPage = useCallback(
-    async (page: number) => {
-      await loadPage(page)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    },
-    [loadPage]
-  )
+  const snap = useBehaviorSubjectValue(tutoresListStore.subject)
 
   useEffect(() => {
-    if (isAuthenticated && !authLoading) loadPage(0)
-  }, [isAuthenticated, authLoading, loadPage])
+    tutoresListStore.configure({ pageSize: options.pageSize, pollingMs: options.pollingMs })
+  }, [options.pageSize, options.pollingMs])
 
   useEffect(() => {
     if (!isAuthenticated || authLoading) return
-    if (!pollingMs || pollingMs <= 0) return
-    const id = window.setInterval(() => void loadPage(currentPage, 'soft'), pollingMs)
-    return () => window.clearInterval(id)
-  }, [isAuthenticated, authLoading, pollingMs, currentPage, loadPage])
+    const unmount = tutoresListStore.mount()
+    return () => unmount()
+  }, [isAuthenticated, authLoading])
 
   const emptyMessage = useMemo(() => {
-    const term = searchTerm.trim()
+    const term = snap.searchTerm.trim()
     if (term) return `Nenhum resultado para "${term}"`
     return 'Não há tutores cadastrados no sistema'
-  }, [searchTerm])
+  }, [snap.searchTerm])
 
   return {
     authLoading,
     isAuthenticated,
-    tutores,
-    loading,
-    refreshing,
-    error,
-    searchTerm,
-    setSearchTerm,
-    currentPage,
-    totalPages,
-    totalElements,
-    search,
-    clearSearch,
-    goToPage,
-    reload: () => loadPage(currentPage),
+    tutores: snap.tutores,
+    loading: snap.loading,
+    refreshing: snap.refreshing,
+    error: snap.error,
+    searchTerm: snap.searchTerm,
+    setSearchTerm: tutoresListStore.setSearchTerm,
+    currentPage: snap.currentPage,
+    totalPages: snap.totalPages,
+    totalElements: snap.totalElements,
+    search: tutoresListStore.search,
+    clearSearch: tutoresListStore.clearSearch,
+    goToPage: tutoresListStore.goToPage,
+    reload: tutoresListStore.reload,
     emptyMessage,
   }
 }
