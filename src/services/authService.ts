@@ -18,7 +18,7 @@ export const authService = {
       )
       storeTokens(response.data)
       return response.data
-    } catch (e) {
+    } catch {
       const response = await api.put<LoginResponse>(
         '/autenticacao/refresh',
         { refresh_token: refreshToken } as RefreshTokenRequest

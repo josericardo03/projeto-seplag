@@ -14,6 +14,11 @@ export type TutoresListState = {
   searchTerm: string
   appliedSearchTerm: string
 
+  hasEmail: boolean
+  hasPhone: boolean
+  hasCpf: boolean
+  hasPhoto: boolean
+
   currentPage: number
   totalPages: number
   totalElements: number
@@ -29,6 +34,10 @@ const initial: TutoresListState = {
   error: null,
   searchTerm: '',
   appliedSearchTerm: '',
+  hasEmail: false,
+  hasPhone: false,
+  hasCpf: false,
+  hasPhoto: false,
   currentPage: 0,
   totalPages: 0,
   totalElements: 0,
@@ -189,6 +198,10 @@ authStore.subject.subscribe((a) => {
       totalElements: 0,
       searchTerm: '',
       appliedSearchTerm: '',
+      hasEmail: false,
+      hasPhone: false,
+      hasCpf: false,
+      hasPhoto: false,
       pageSize: s.pageSize,
       pollingMs: s.pollingMs,
     })
@@ -204,6 +217,11 @@ export const tutoresListStore = {
   configure,
   mount,
   setSearchTerm: (value: string) => set({ searchTerm: value }),
+  setHasEmail: (value: boolean) => set({ hasEmail: value }),
+  setHasPhone: (value: boolean) => set({ hasPhone: value }),
+  setHasCpf: (value: boolean) => set({ hasCpf: value }),
+  setHasPhoto: (value: boolean) => set({ hasPhoto: value }),
+  clearFilters: () => set({ hasEmail: false, hasPhone: false, hasCpf: false, hasPhoto: false }),
   search,
   clearSearch,
   goToPage,

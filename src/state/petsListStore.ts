@@ -14,6 +14,12 @@ export type PetsListState = {
   searchTerm: string
   appliedSearchTerm: string
 
+  speciesFilter: string
+  ageMinText: string
+  ageMaxText: string
+  hasPhoto: boolean
+  hasTutor: boolean
+
   currentPage: number
   totalPages: number
   totalElements: number
@@ -29,6 +35,11 @@ const initial: PetsListState = {
   error: null,
   searchTerm: '',
   appliedSearchTerm: '',
+  speciesFilter: '',
+  ageMinText: '',
+  ageMaxText: '',
+  hasPhoto: false,
+  hasTutor: false,
   currentPage: 0,
   totalPages: 0,
   totalElements: 0,
@@ -190,6 +201,11 @@ authStore.subject.subscribe((a) => {
       totalElements: 0,
       searchTerm: '',
       appliedSearchTerm: '',
+      speciesFilter: '',
+      ageMinText: '',
+      ageMaxText: '',
+      hasPhoto: false,
+      hasTutor: false,
       pageSize: s.pageSize,
       pollingMs: s.pollingMs,
     })
@@ -205,6 +221,19 @@ export const petsListStore = {
   configure,
   mount,
   setSearchTerm: (value: string) => set({ searchTerm: value }),
+  setSpeciesFilter: (value: string) => set({ speciesFilter: value }),
+  setAgeMinText: (value: string) => set({ ageMinText: value }),
+  setAgeMaxText: (value: string) => set({ ageMaxText: value }),
+  setHasPhoto: (value: boolean) => set({ hasPhoto: value }),
+  setHasTutor: (value: boolean) => set({ hasTutor: value }),
+  clearFilters: () =>
+    set({
+      speciesFilter: '',
+      ageMinText: '',
+      ageMaxText: '',
+      hasPhoto: false,
+      hasTutor: false,
+    }),
   search,
   clearSearch,
   goToPage,

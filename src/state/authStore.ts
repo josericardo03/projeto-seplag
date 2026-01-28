@@ -22,6 +22,16 @@ function set(patch: Partial<AuthState>) {
   subject.next({ ...subject.getValue(), ...patch })
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const id = window.setTimeout(() => reject(new Error(message)), ms)
+    promise
+      .then((v) => resolve(v))
+      .catch((e) => reject(e))
+      .finally(() => window.clearTimeout(id))
+  })
+}
+
 async function init() {
   const current = subject.getValue()
   if (initialized && current.isLoading === false) return
@@ -64,8 +74,17 @@ async function refresh() {
     return
   }
   set({ isLoading: true, error: null })
-  await authService.refreshToken(refreshToken)
-  set({ isAuthenticated: isAccessValid(), isLoading: false })
+  try {
+    await withTimeout(
+      authService.refreshToken(refreshToken),
+      5_000,
+      'Tempo limite ao atualizar sessão. Faça login novamente.'
+    )
+    set({ isAuthenticated: isAccessValid(), isLoading: false })
+  } catch (e: any) {
+    clearTokens()
+    set({ isAuthenticated: false, isLoading: false, error: e?.message || 'Erro ao atualizar sessão' })
+  }
 }
 
 export const authStore = {

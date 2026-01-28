@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 
 export function TutorPhotoUploader(props: {
   existingUrl?: string | null
@@ -10,17 +10,12 @@ export function TutorPhotoUploader(props: {
   removingRemote?: boolean
 }) {
   const { existingUrl, existingId, file, disabled, onPick, onRemoveRemote, removingRemote } = props
-  const [localUrl, setLocalUrl] = useState<string | null>(null)
 
+  const localUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file])
   useEffect(() => {
-    if (!file) {
-      setLocalUrl(null)
-      return
-    }
-    const url = URL.createObjectURL(file)
-    setLocalUrl(url)
-    return () => URL.revokeObjectURL(url)
-  }, [file])
+    if (!localUrl) return
+    return () => URL.revokeObjectURL(localUrl)
+  }, [localUrl])
 
   const previewUrl = useMemo(() => localUrl || existingUrl || null, [localUrl, existingUrl])
   const canRemoveRemote = !!existingId && !!existingUrl && !!onRemoveRemote
