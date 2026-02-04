@@ -10,6 +10,13 @@ const REFRESH = 'refresh_token'
 const ACCESS_EXPIRES = 'access_token_expires_at'
 const REFRESH_EXPIRES = 'refresh_token_expires_at'
 
+export const TOKEN_STORAGE_KEYS = {
+  ACCESS,
+  REFRESH,
+  ACCESS_EXPIRES,
+  REFRESH_EXPIRES,
+} as const
+
 export function readTokens(): StoredTokens | null {
   const accessToken = localStorage.getItem(ACCESS)
   const refreshToken = localStorage.getItem(REFRESH)

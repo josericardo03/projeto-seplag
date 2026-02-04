@@ -1,6 +1,7 @@
 import axios, { AxiosHeaders, type InternalAxiosRequestConfig } from 'axios'
 import { authService } from './authService'
 import { clearTokens, getAccessToken, getRefreshToken, isRefreshValid } from './tokenStorage'
+import { AUTH_EVENTS, type AuthLogoutReason } from '../utils/authEvents'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://pet-manager-api.geia.vip'
 
@@ -88,7 +89,21 @@ api.interceptors.response.use(
           return api(originalRequest)
         } catch (refreshError) {
           clearTokens()
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(
+              new CustomEvent<{ reason: AuthLogoutReason }>(AUTH_EVENTS.LOGOUT, { detail: { reason: 'refresh_failed' } })
+            )
+          }
           return Promise.reject(refreshError)
+        }
+      } else {
+        clearTokens()
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent<{ reason: AuthLogoutReason }>(AUTH_EVENTS.LOGOUT, {
+              detail: { reason: 'refresh_missing_or_expired' },
+            })
+          )
         }
       }
     }
