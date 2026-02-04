@@ -10,6 +10,7 @@ type PetFormState = {
   petId: number | null
   initialLoading: boolean
   saving: boolean
+  removingPhoto: boolean
   error: string | null
   success: string | null
   fieldErrors: Record<string, string>
@@ -20,6 +21,7 @@ type PetFormState = {
   raca: string
 
   existingPhotoUrl: string | null
+  existingPhotoId: number | null
   photoFile: File | null
 }
 
@@ -55,6 +57,7 @@ export function createPetFormStore() {
     petId: null,
     initialLoading: false,
     saving: false,
+    removingPhoto: false,
     error: null,
     success: null,
     fieldErrors: {},
@@ -63,6 +66,7 @@ export function createPetFormStore() {
     idadeText: '',
     raca: '',
     existingPhotoUrl: null,
+    existingPhotoId: null,
     photoFile: null,
   })
 
@@ -76,6 +80,7 @@ export function createPetFormStore() {
       petId,
       initialLoading,
       saving: false,
+      removingPhoto: false,
       error: null,
       success: null,
       fieldErrors: {},
@@ -84,6 +89,7 @@ export function createPetFormStore() {
       idadeText: '',
       raca: '',
       existingPhotoUrl: null,
+      existingPhotoId: null,
       photoFile: null,
     })
   }
@@ -102,11 +108,26 @@ export function createPetFormStore() {
         idadeText: String(pet.idade ?? ''),
         raca: pet.raca || '',
         existingPhotoUrl: pet.foto?.url || null,
+        existingPhotoId: typeof pet.foto?.id === 'number' ? pet.foto.id : null,
       })
     } catch (e: unknown) {
       set({ error: getErrorMessage(e, 'Erro ao carregar pet') })
     } finally {
       set({ initialLoading: false })
+    }
+  }
+
+  async function removeExistingPhoto() {
+    const s = subject.getValue()
+    if (!s.petId || !s.existingPhotoId) return
+    try {
+      set({ removingPhoto: true, error: null, success: null })
+      await petService.deletePhoto(s.petId, s.existingPhotoId)
+      set({ existingPhotoId: null, existingPhotoUrl: null, success: 'Foto removida com sucesso' })
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e, 'Erro ao remover foto') })
+    } finally {
+      set({ removingPhoto: false })
     }
   }
 
@@ -176,6 +197,7 @@ export function createPetFormStore() {
     setRaca: (value: string) => set({ raca: value }),
     onChangeIdade,
     onPickPhoto: (file: File | null) => set({ photoFile: file }),
+    removeExistingPhoto,
     submit,
   } as const
 }

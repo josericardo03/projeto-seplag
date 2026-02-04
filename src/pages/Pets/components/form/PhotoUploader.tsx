@@ -2,11 +2,14 @@ import { useEffect, useMemo } from 'react'
 
 export function PhotoUploader(props: {
   existingUrl?: string | null
+  existingId?: number | null
   file: File | null
   disabled?: boolean
   onPick: (file: File | null) => void
+  onRemoveRemote?: () => void
+  removingRemote?: boolean
 }) {
-  const { existingUrl, file, disabled, onPick } = props
+  const { existingUrl, existingId, file, disabled, onPick, onRemoveRemote, removingRemote } = props
 
   const localUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file])
   useEffect(() => {
@@ -15,6 +18,7 @@ export function PhotoUploader(props: {
   }, [localUrl])
 
   const previewUrl = useMemo(() => localUrl || existingUrl || null, [localUrl, existingUrl])
+  const canRemoveRemote = !!existingId && !!existingUrl && !!onRemoveRemote
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 items-start">
@@ -43,12 +47,23 @@ export function PhotoUploader(props: {
 
           <button
             type="button"
-            disabled={!!disabled || (!file && !previewUrl)}
+            disabled={!!disabled || (!file && !previewUrl) || !!removingRemote}
             onClick={() => onPick(null)}
             className="inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 font-semibold hover:bg-slate-50 transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             Remover
           </button>
+
+          {canRemoveRemote && (
+            <button
+              type="button"
+              onClick={onRemoveRemote}
+              disabled={!!disabled || !!removingRemote}
+              className="inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-red-50 border border-red-100 text-red-700 font-semibold hover:bg-red-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {removingRemote ? 'Removendo...' : 'Remover do pet'}
+            </button>
+          )}
         </div>
 
         <p className="text-xs text-slate-500">

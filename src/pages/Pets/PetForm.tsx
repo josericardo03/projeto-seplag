@@ -25,8 +25,11 @@ export default function PetForm() {
     raca,
     setRaca,
     existingPhotoUrl,
+    existingPhotoId,
     photoFile,
     onPickPhoto,
+    removeExistingPhoto,
+    removingPhoto,
     fieldErrors,
     submit,
     cancel,
@@ -165,7 +168,15 @@ export default function PetForm() {
 
           <div className="space-y-3">
             <h2 className="text-lg font-bold text-slate-900">Foto</h2>
-            <PhotoUploader existingUrl={existingPhotoUrl} file={photoFile} disabled={saving} onPick={onPickPhoto} />
+            <PhotoUploader
+              existingUrl={existingPhotoUrl}
+              existingId={existingPhotoId}
+              file={photoFile}
+              disabled={saving}
+              onPick={onPickPhoto}
+              onRemoveRemote={mode === 'edit' ? removeExistingPhoto : undefined}
+              removingRemote={removingPhoto}
+            />
           </div>
 
           <FormActions mode={mode} saving={saving} onCancel={cancel} onSubmit={submit} />

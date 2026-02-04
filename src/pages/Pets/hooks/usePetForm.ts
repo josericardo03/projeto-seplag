@@ -49,8 +49,11 @@ export function usePetForm() {
     setRaca: store.setRaca,
 
     existingPhotoUrl: snap.existingPhotoUrl,
+    existingPhotoId: snap.existingPhotoId,
     photoFile: snap.photoFile,
     onPickPhoto: store.onPickPhoto,
+    removeExistingPhoto: store.removeExistingPhoto,
+    removingPhoto: snap.removingPhoto,
 
     fieldErrors: snap.fieldErrors,
     submit: () => store.submit((path) => navigate(path)),

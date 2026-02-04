@@ -63,6 +63,11 @@ export const petService = {
     petByIdCache.invalidate(petId)
   },
 
+  async deletePhoto(petId: number, fotoId: number): Promise<void> {
+    await api.delete(`/v1/pets/${petId}/fotos/${fotoId}`)
+    petByIdCache.invalidate(petId)
+  },
+
   async deletePet(id: number): Promise<void> {
     await api.delete(`/v1/pets/${id}`)
     petByIdCache.invalidate(id)
