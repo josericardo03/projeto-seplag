@@ -2,6 +2,7 @@ import { BehaviorSubject } from 'rxjs'
 import { petService, type PetListParams } from '../services/petService'
 import type { PageableResponse, Pet } from '../types'
 import { authStore } from './authStore'
+import { getErrorMessage } from '../utils/errors'
 
 type Mode = 'full' | 'soft'
 
@@ -52,6 +53,7 @@ const subject = new BehaviorSubject<PetsListState>(initial)
 let mountedCount = 0
 let pollId: number | null = null
 let lastAuth = authStore.subject.getValue()
+let visible = typeof document === 'undefined' ? true : document.visibilityState !== 'hidden'
 
 function set(patch: Partial<PetsListState>) {
   subject.next({ ...subject.getValue(), ...patch })
@@ -91,13 +93,13 @@ async function loadPage(page: number, mode: Mode = 'full') {
       totalElements: response.totalElements || 0,
       currentPage: response.number || 0,
     })
-  } catch (e: any) {
+  } catch (e: unknown) {
     set({
       pets: [],
       totalPages: 0,
       totalElements: 0,
       currentPage: 0,
-      error: e?.response?.data?.message || e?.message || 'Erro ao carregar pets',
+      error: getErrorMessage(e, 'Erro ao carregar pets'),
     })
   } finally {
     set({ loading: false, refreshing: false })
@@ -116,13 +118,13 @@ async function search() {
       totalElements: response.totalElements || 0,
       currentPage: response.number || 0,
     })
-  } catch (e: any) {
+  } catch (e: unknown) {
     set({
       pets: [],
       totalPages: 0,
       totalElements: 0,
       currentPage: 0,
-      error: e?.response?.data?.message || e?.message || 'Erro ao buscar pets',
+      error: getErrorMessage(e, 'Erro ao buscar pets'),
     })
   } finally {
     set({ loading: false })
@@ -148,6 +150,7 @@ function startPolling() {
   stopPolling()
   const s = subject.getValue()
   if (!s.pollingMs || s.pollingMs <= 0) return
+  if (!visible) return
   pollId = window.setInterval(() => {
     void loadPage(subject.getValue().currentPage, 'soft')
   }, s.pollingMs)
@@ -163,6 +166,13 @@ function reconcile() {
     return
   }
   startPolling()
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    visible = document.visibilityState !== 'hidden'
+    reconcile()
+  })
 }
 
 function mount() {

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { PetsHeader } from '../Pets/components/shared/PetsHeader'
+import { PetsHeader } from '../../components/layout/PetsHeader'
 
 function LobbyCard(props: { title: string; desc: string; to: string; cta: string; gradient: string }) {
   const { title, desc, to, cta, gradient } = props

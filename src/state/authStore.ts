@@ -1,6 +1,9 @@
 import { BehaviorSubject } from 'rxjs'
 import { authService } from '../services/authService'
 import { clearTokens, getRefreshToken, isAccessValid, isRefreshValid, readTokens } from '../services/tokenStorage'
+import { petService } from '../services/petService'
+import { tutorService } from '../services/tutorService'
+import { getErrorMessage } from '../utils/errors'
 
 export type AuthState = {
   isAuthenticated: boolean
@@ -49,9 +52,9 @@ async function init() {
     }
     clearTokens()
     set({ isAuthenticated: false, isLoading: false })
-  } catch (e: any) {
+  } catch (e: unknown) {
     clearTokens()
-    set({ isAuthenticated: false, isLoading: false, error: e?.message || 'Erro ao autenticar' })
+    set({ isAuthenticated: false, isLoading: false, error: getErrorMessage(e, 'Erro ao autenticar') })
   }
 }
 
@@ -63,6 +66,9 @@ async function login(username: string, password: string) {
 
 function logout() {
   authService.logout()
+  // Evita “vazar” dados em memória entre sessões/usuários
+  petService.clearCache()
+  tutorService.clearCache()
   set({ isAuthenticated: false, isLoading: false, error: null })
 }
 
@@ -81,9 +87,9 @@ async function refresh() {
       'Tempo limite ao atualizar sessão. Faça login novamente.'
     )
     set({ isAuthenticated: isAccessValid(), isLoading: false })
-  } catch (e: any) {
+  } catch (e: unknown) {
     clearTokens()
-    set({ isAuthenticated: false, isLoading: false, error: e?.message || 'Erro ao atualizar sessão' })
+    set({ isAuthenticated: false, isLoading: false, error: getErrorMessage(e, 'Erro ao atualizar sessão') })
   }
 }
 

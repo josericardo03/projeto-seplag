@@ -4,6 +4,7 @@ import { petService } from '../../../services/petService'
 import { tutorService } from '../../../services/tutorService'
 import type { Pet, Tutor } from '../../../types'
 import { useAuth } from '../../../hooks/useAuth'
+import { getErrorMessage } from '../../../utils/errors'
 
 export function usePetDetails() {
   const { id } = useParams<{ id: string }>()
@@ -40,7 +41,7 @@ export function usePetDetails() {
         const petData = await petService.getPetById(petId)
         setPet(petData)
 
-        const tutorsFromPet = Array.isArray((petData as any).tutores) ? ((petData as any).tutores as Tutor[]) : []
+        const tutorsFromPet = petData.tutores ?? []
         if (tutorsFromPet.length > 0) {
           setTutores(tutorsFromPet)
           const ids = tutorsFromPet.map((t) => t.id).filter((x) => Number.isFinite(x))
@@ -55,10 +56,10 @@ export function usePetDetails() {
           if (!mountedRef.current) return
           setTutores([tutorData])
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         setPet(null)
         setTutores([])
-        setError(err?.response?.data?.message || 'Erro ao carregar dados do pet')
+        setError(getErrorMessage(err, 'Erro ao carregar dados do pet'))
       } finally {
         setLoading(false)
       }

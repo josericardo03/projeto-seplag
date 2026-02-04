@@ -1,12 +1,16 @@
 import api from './api'
 import type { Pet, Tutor } from '../types'
 import type { PageableResponse } from '../types'
+import { createAsyncCache } from './asyncCache'
+import { adaptPageableResponse } from '../utils/pageable'
 
 export interface TutorListParams {
   page?: number
   size?: number
   nome?: string
 }
+
+const tutorByIdCache = createAsyncCache<number, Tutor>({ ttlMs: 2 * 60_000 })
 
 export const tutorService = {
   async getTutores(params: TutorListParams = {}): Promise<PageableResponse<Tutor>> {
@@ -22,19 +26,7 @@ export const tutorService = {
     const response = await api.get<PageableResponse<Tutor>>(`/v1/tutores?${queryParams.toString()}`)
 
     if (!response.data) throw new Error('Resposta da API está vazia')
-    const data = response.data as any
-
-    const adapted: PageableResponse<Tutor> = {
-      content: data.content || [],
-      totalElements: data.total ?? data.totalElements ?? 0,
-      totalPages: data.pageCount ?? data.totalPages ?? 0,
-      size: data.size ?? size,
-      number: data.page ?? data.number ?? page,
-      first: (data.page ?? page) === 0,
-      last: (data.page ?? page) >= ((data.pageCount ?? data.totalPages ?? 1) - 1),
-    }
-
-    return adapted
+    return adaptPageableResponse<Tutor>(response.data, { page, size })
   },
 
   async createTutor(payload: Omit<Tutor, 'id'>): Promise<Tutor> {
@@ -44,12 +36,15 @@ export const tutorService = {
 
   async updateTutor(id: number, payload: Partial<Omit<Tutor, 'id'>>): Promise<Tutor> {
     const response = await api.put<Tutor>(`/v1/tutores/${id}`, payload)
+    tutorByIdCache.invalidate(id)
     return response.data
   },
 
   async getTutorById(id: number): Promise<Tutor> {
-    const response = await api.get<Tutor>(`/v1/tutores/${id}`)
-    return response.data
+    return await tutorByIdCache.getOrLoad(id, async () => {
+      const response = await api.get<Tutor>(`/v1/tutores/${id}`)
+      return response.data
+    })
   },
 
   async uploadPhoto(tutorId: number, file: File): Promise<void> {
@@ -61,18 +56,22 @@ export const tutorService = {
         'Content-Type': 'multipart/form-data',
       },
     })
+    tutorByIdCache.invalidate(tutorId)
   },
 
   async deletePhoto(tutorId: number, fotoId: number): Promise<void> {
     await api.delete(`/v1/tutores/${tutorId}/fotos/${fotoId}`)
+    tutorByIdCache.invalidate(tutorId)
   },
 
   async getTutorPets(tutorId: number): Promise<Pet[]> {
-    const response = await api.get<any>(`/v1/tutores/${tutorId}/pets`)
+    const response = await api.get<unknown>(`/v1/tutores/${tutorId}/pets`)
     const data = response.data
     if (!data) return []
-    if (Array.isArray(data)) return data as Pet[]
-    if (Array.isArray(data.content)) return data.content as Pet[]
+    if (Array.isArray(data)) return data as unknown as Pet[]
+    if (typeof data === 'object' && data !== null && Array.isArray((data as { content?: unknown }).content)) {
+      return (data as { content: unknown[] }).content as unknown as Pet[]
+    }
     return []
   },
 
@@ -86,5 +85,10 @@ export const tutorService = {
 
   async deleteTutor(id: number): Promise<void> {
     await api.delete(`/v1/tutores/${id}`)
+    tutorByIdCache.invalidate(id)
+  },
+
+  clearCache(): void {
+    tutorByIdCache.clear()
   },
 }

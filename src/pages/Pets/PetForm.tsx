@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
-import { PetsHeader } from './components/shared/PetsHeader'
-import { FullPageAuthError, FullPageSpinner, RenderError } from './components/shared/PageStates'
+import { PetsHeader } from '../../components/layout/PetsHeader'
+import { FullPageAuthError, FullPageSpinner, RenderError } from '../../components/ui/PageStates'
 import { usePetForm } from './hooks/usePetForm'
-import { Field } from './components/form/Field'
-import { NumberLikeInput, TextInput } from './components/form/Inputs'
+import { Field } from '../../components/ui/Field'
+import { NumberLikeInput, TextInput } from '../../components/ui/Inputs'
 import { PhotoUploader } from './components/form/PhotoUploader'
-import { FormActions } from './components/form/FormActions'
+import { FormActions } from '../../components/ui/FormActions'
 
 export default function PetForm() {
   const {

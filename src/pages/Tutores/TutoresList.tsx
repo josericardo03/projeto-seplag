@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
-import { PetsHeader } from '../Pets/components/shared/PetsHeader'
-import { FullPageSpinner } from '../Pets/components/shared/PageStates'
+import { PetsHeader } from '../../components/layout/PetsHeader'
+import { FullPageSpinner } from '../../components/ui/PageStates'
 import { useTutoresList } from './hooks/useTutoresList'
 import { TutorCard } from './components/TutorCard'
-import { Pagination } from './components/Pagination'
+import { Pagination } from '../../components/Pagination'
+import { Button } from '../../components/ui/Button'
+import { TextInput } from '../../components/ui/Inputs'
 
 export default function TutoresList() {
   const {
@@ -44,22 +46,21 @@ export default function TutoresList() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-200">
       <PetsHeader />
 
-      <div className="max-w-7xl mx-auto p-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-900">Tutores</h1>
             <p className="text-slate-600 mt-1">Listagem paginada (GET /v1/tutores?page&size)</p>
           </div>
-          <Link
-            to="/tutores/novo"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700 transition w-full sm:w-auto"
-          >
-            + Cadastrar Tutor
+          <Link to="/tutores/novo" className="w-full sm:w-auto">
+            <Button variant="primary" className="w-full sm:w-auto">
+              + Cadastrar Tutor
+            </Button>
           </Link>
         </div>
 
         {error && (
-          <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm font-semibold">
+          <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm font-semibold" role="alert">
             <span>Falha ao carregar:</span>
             <span className="font-bold">{error}</span>
             <button type="button" onClick={reload} className="ml-2 underline hover:no-underline">
@@ -90,32 +91,21 @@ export default function TutoresList() {
             <div className="max-w-xl w-full">
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                  <input
+                  <TextInput
                     type="text"
                     placeholder="Buscar por nome (se disponível na API)..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && search()}
-                    className="block w-full px-4 py-3 rounded-2xl bg-white/90 border border-slate-200 shadow-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     disabled={loading}
                   />
                 </div>
-                <button
-                  type="button"
-                  onClick={search}
-                  disabled={loading}
-                  className="px-5 py-3 rounded-2xl bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                >
+                <Button onClick={search} disabled={loading} variant="primary" className="px-5 py-3">
                   Buscar
-                </button>
-                <button
-                  type="button"
-                  onClick={clearSearch}
-                  disabled={loading && !searchTerm}
-                  className="px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-800 font-semibold shadow-sm hover:bg-slate-50 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                >
+                </Button>
+                <Button onClick={clearSearch} disabled={loading && !searchTerm} variant="secondary" className="px-5 py-3">
                   Limpar
-                </button>
+                </Button>
               </div>
               <p className="mt-2 text-xs text-slate-500">Dica: pressione Enter para buscar.</p>
             </div>
@@ -127,14 +117,9 @@ export default function TutoresList() {
                 <h2 className="text-base font-extrabold text-slate-900">Filtros</h2>
                 <p className="text-slate-600 text-sm mt-1">Aplicados localmente na página atual.</p>
               </div>
-              <button
-                type="button"
-                onClick={clearFilters}
-                disabled={!filtersActive || loading}
-                className="px-4 py-2 rounded-2xl bg-white border border-slate-200 text-slate-800 font-semibold shadow-sm hover:bg-slate-50 transition disabled:opacity-60 disabled:cursor-not-allowed"
-              >
+              <Button onClick={clearFilters} disabled={!filtersActive || loading} variant="secondary" size="sm">
                 Limpar filtros
-              </button>
+              </Button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -211,7 +196,7 @@ export default function TutoresList() {
         )}
 
         <Pagination currentPage={currentPage} totalPages={totalPages} onPage={goToPage} />
-      </div>
+      </main>
     </div>
   )
 }

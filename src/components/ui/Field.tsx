@@ -14,7 +14,11 @@ export function Field(props: {
         {label}
       </label>
       {children}
-      {error ? <p className="text-sm text-red-600 font-medium">{error}</p> : hint ? <p className="text-xs text-slate-500">{hint}</p> : null}
+      {error ? (
+        <p className="text-sm text-red-600 font-medium">{error}</p>
+      ) : hint ? (
+        <p className="text-xs text-slate-500">{hint}</p>
+      ) : null}
     </div>
   )
 }

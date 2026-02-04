@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosHeaders, type InternalAxiosRequestConfig } from 'axios'
 import { authService } from './authService'
 import { clearTokens, getAccessToken, getRefreshToken, isRefreshValid } from './tokenStorage'
 
@@ -14,10 +14,27 @@ const api = axios.create({
 })
 
 api.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig) => {
     const token = getAccessToken()
     if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`
+      // Não sobrescrever Authorization quando a chamada já define um token próprio
+      // (ex.: refresh usa o refresh_token no header).
+      const headers = config.headers
+      const hasAuthorization =
+        (headers instanceof AxiosHeaders && Boolean(headers.get('Authorization'))) ||
+        (!(headers instanceof AxiosHeaders) &&
+          Boolean(
+            (headers as Record<string, unknown>)['Authorization'] ||
+              (headers as Record<string, unknown>)['authorization']
+          ))
+
+      if (!hasAuthorization) {
+        if (headers instanceof AxiosHeaders) {
+          headers.set('Authorization', `Bearer ${token}`)
+        } else {
+          ;(headers as Record<string, unknown>)['Authorization'] = `Bearer ${token}`
+        }
+      }
     }
     return config
   },
@@ -38,7 +55,7 @@ api.interceptors.response.use(
     return response
   },
   async (error) => {
-    const originalRequest = error.config
+    const originalRequest = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined
 
     if (
       error.response?.status === 401 &&
@@ -62,7 +79,11 @@ api.interceptors.response.use(
 
           const access_token = await refreshPromise
           if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${access_token}`
+            if (originalRequest.headers instanceof AxiosHeaders) {
+              originalRequest.headers.set('Authorization', `Bearer ${access_token}`)
+            } else {
+              ;(originalRequest.headers as Record<string, unknown>)['Authorization'] = `Bearer ${access_token}`
+            }
           }
           return api(originalRequest)
         } catch (refreshError) {

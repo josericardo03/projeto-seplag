@@ -9,9 +9,13 @@ vi.mock('../../hooks/useAuth', () => ({
 
 import { useAuth } from '../../hooks/useAuth'
 
+type UseAuthMock = {
+  mockReturnValue: (value: unknown) => void
+}
+
 describe('ProtectedRoute', () => {
   it('redireciona para /login quando não autenticado', () => {
-    ;(useAuth as any).mockReturnValue({ isAuthenticated: false, isLoading: false })
+    ;(useAuth as unknown as UseAuthMock).mockReturnValue({ isAuthenticated: false, isLoading: false })
 
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={['/privado']}>
@@ -33,7 +37,7 @@ describe('ProtectedRoute', () => {
   })
 
   it('renderiza children quando autenticado', () => {
-    ;(useAuth as any).mockReturnValue({ isAuthenticated: true, isLoading: false })
+    ;(useAuth as unknown as UseAuthMock).mockReturnValue({ isAuthenticated: true, isLoading: false })
 
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }} initialEntries={['/privado']}>

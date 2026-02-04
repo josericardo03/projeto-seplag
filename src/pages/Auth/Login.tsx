@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { getErrorMessage } from '../../utils/errors'
 
 export default function Login() {
   const { isAuthenticated, isLoading, error, login } = useAuth()
@@ -12,7 +13,8 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
 
-  const from = (location.state as any)?.from?.pathname || '/'
+  const state = location.state as { from?: { pathname?: string } } | null
+  const from = state?.from?.pathname || '/'
 
   if (!isLoading && isAuthenticated) return <Navigate to={from} replace />
 
@@ -26,8 +28,8 @@ export default function Login() {
       setSubmitting(true)
       await login(username.trim(), password)
       navigate(from, { replace: true })
-    } catch (e: any) {
-      setLocalError(e?.response?.data?.message || e?.message || 'Falha ao autenticar')
+    } catch (e: unknown) {
+      setLocalError(getErrorMessage(e, 'Falha ao autenticar'))
     } finally {
       setSubmitting(false)
     }

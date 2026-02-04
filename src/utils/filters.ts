@@ -45,13 +45,12 @@ export function applyPetFilters(list: Pet[], filters: PetFilters): Pet[] {
     }
 
     if (filters.hasPhoto) {
-      const has = !!(pet as any)?.foto?.url
+      const has = !!pet.foto?.url
       if (!has) return false
     }
 
     if (filters.hasTutor) {
-      const tutores = (pet as any)?.tutores
-      const has = Array.isArray(tutores) && tutores.length > 0
+      const has = (pet.tutores?.length ?? 0) > 0 || typeof pet.tutorId === 'number'
       if (!has) return false
     }
 
@@ -67,7 +66,7 @@ export type TutorFilters = {
 }
 
 function tutorHasPhoto(tutor: Tutor) {
-  const foto = (tutor as any).foto
+  const foto = tutor.foto
   if (!foto) return false
   if (typeof foto === 'string') return foto.trim().length > 0
   if (typeof foto === 'object' && typeof foto.url === 'string') return foto.url.trim().length > 0
@@ -76,9 +75,9 @@ function tutorHasPhoto(tutor: Tutor) {
 
 export function applyTutorFilters(list: Tutor[], filters: TutorFilters): Tutor[] {
   return list.filter((t) => {
-    if (filters.hasEmail && !(t as any).email) return false
-    if (filters.hasPhone && !(t as any).telefone) return false
-    if (filters.hasCpf && !(t as any).cpf) return false
+    if (filters.hasEmail && !t.email) return false
+    if (filters.hasPhone && !t.telefone) return false
+    if (filters.hasCpf && !t.cpf) return false
     if (filters.hasPhoto && !tutorHasPhoto(t)) return false
     return true
   })

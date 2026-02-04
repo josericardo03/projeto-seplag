@@ -10,6 +10,12 @@ export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
 
 export function NumberLikeInput(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className, inputMode, ...rest } = props
-  return <input {...rest} inputMode={inputMode || 'numeric'} className={[base, className].filter(Boolean).join(' ')} />
+  return (
+    <input
+      {...rest}
+      inputMode={inputMode || 'numeric'}
+      className={[base, className].filter(Boolean).join(' ')}
+    />
+  )
 }
 

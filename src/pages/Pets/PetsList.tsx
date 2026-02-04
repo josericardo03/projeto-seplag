@@ -1,15 +1,15 @@
 import { useNavigate } from 'react-router-dom'
-import { PetsHeader } from './components/shared/PetsHeader'
+import { PetsHeader } from '../../components/layout/PetsHeader'
 import { PetsListHero } from './components/list/PetsListHero'
 import { SearchBar } from './components/list/SearchBar'
-import { Pagination } from './components/list/Pagination'
+import { Pagination } from '../../components/Pagination'
 import { PetsGrid } from './components/list/PetsGrid'
 import {
   DevStatusBar,
   EmptyState,
   InlineCount,
 } from './components/list/States'
-import { FullPageSpinner } from './components/shared/PageStates'
+import { FullPageSpinner } from '../../components/ui/PageStates'
 import { usePetsList } from './hooks/usePetsList'
 
 export default function PetsList() {
@@ -66,7 +66,10 @@ export default function PetsList() {
           />
         )}
 
-        <PetsListHero onAdd={() => navigate('/pets/novo')} />
+        <PetsListHero
+          onAdd={() => navigate('/pets/novo')}
+          onViewTutores={() => navigate('/tutores')}
+        />
 
         {error && (
           <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm font-semibold">
@@ -202,16 +205,6 @@ export default function PetsList() {
         )}
 
         <Pagination currentPage={currentPage} totalPages={totalPages} onPage={goToPage} />
-
-        <div className="mt-12 flex flex-col sm:flex-row gap-3 justify-center">
-          <button
-            type="button"
-            onClick={() => navigate('/tutores')}
-            className="px-6 py-3 rounded-2xl bg-white/80 border border-slate-200 text-slate-800 font-semibold shadow-sm hover:bg-white transition"
-          >
-            Ver Tutores
-          </button>
-        </div>
       </main>
     </div>
   )

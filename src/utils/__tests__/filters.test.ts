@@ -1,15 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { applyPetFilters, applyTutorFilters, hasActivePetFilters, hasActiveTutorFilters } from '../filters'
+import type { Pet, Tutor } from '../../types'
 
 describe('filters', () => {
   it('applyPetFilters filtra por espécie, idade, foto e tutor', () => {
-    const list: any[] = [
-      { id: 1, nome: 'Rex', especie: 'Cachorro', idade: 3, foto: { url: 'x' }, tutores: [{ id: 1 }] },
+    const list: Pet[] = [
+      { id: 1, nome: 'Rex', especie: 'Cachorro', idade: 3, foto: { id: 1, nome: 'x', contentType: 'x', url: 'x' }, tutores: [{ id: 1, nome: 'T' }] },
       { id: 2, nome: 'Mimi', especie: 'Gato', idade: 1, foto: null, tutores: [] },
-      { id: 3, nome: 'Bob', especie: 'Cachorro', idade: 10, foto: { url: '' }, tutores: [{ id: 2 }] },
+      { id: 3, nome: 'Bob', especie: 'Cachorro', idade: 10, foto: { id: 2, nome: 'y', contentType: 'y', url: '' }, tutores: [{ id: 2, nome: 'U' }] },
     ]
 
-    const res = applyPetFilters(list as any, {
+    const res = applyPetFilters(list, {
       speciesFilter: 'cach',
       ageMinText: '2',
       ageMaxText: '9',
@@ -21,13 +22,13 @@ describe('filters', () => {
   })
 
   it('applyTutorFilters filtra por email/telefone/cpf/foto', () => {
-    const list: any[] = [
-      { id: 1, nome: 'A', email: 'a@a.com', telefone: 'x', cpf: 1, foto: { url: 'x' } },
-      { id: 2, nome: 'B', email: '', telefone: '', cpf: null, foto: null },
-      { id: 3, nome: 'C', email: 'c@c.com', telefone: null, cpf: 2, foto: 'http://x' },
+    const list: Tutor[] = [
+      { id: 1, nome: 'A', email: 'a@a.com', telefone: 'x', cpf: 1, foto: { id: 1, nome: 'x', contentType: 'x', url: 'x' } },
+      { id: 2, nome: 'B', email: '', telefone: '', cpf: undefined, foto: null },
+      { id: 3, nome: 'C', email: 'c@c.com', telefone: undefined, cpf: 2, foto: 'http://x' },
     ]
 
-    const res = applyTutorFilters(list as any, { hasEmail: true, hasPhone: false, hasCpf: true, hasPhoto: true })
+    const res = applyTutorFilters(list, { hasEmail: true, hasPhone: false, hasCpf: true, hasPhoto: true })
     expect(res.map((t) => t.id)).toEqual([1, 3])
   })
 

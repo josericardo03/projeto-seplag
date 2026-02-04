@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom'
 import type { Pet } from '../../../types'
+import { Field } from '../../../components/ui/Field'
+import { NumberLikeInput } from '../../../components/ui/Inputs'
+import { Button } from '../../../components/ui/Button'
 
 function getPetPhotoUrl(pet: Pet) {
   return pet.foto?.url || null
@@ -36,37 +39,34 @@ export function TutorPetsLinker(props: {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-start">
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold text-slate-800" htmlFor="petId">
-            Vincular por ID do pet
-          </label>
-          <input
+        <Field label="Vincular por ID do pet" htmlFor="petId" error={petIdError} hint="Dica: pressione Enter para vincular.">
+          <NumberLikeInput
             id="petId"
             value={petIdText}
             onChange={(e) => onChangePetId(e.target.value)}
             placeholder="Ex.: 288"
-            className="block w-full px-4 py-3 rounded-2xl bg-white/90 border border-slate-200 shadow-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed"
             disabled={!!disabled}
-            inputMode="numeric"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && hasPetId && !disabled) onLink()
+            }}
           />
-          {petIdError && <p className="text-sm text-red-600 font-medium">{petIdError}</p>}
-        </div>
+        </Field>
 
-        <div className="mt-7 md:mt-0 flex gap-2 w-full md:w-auto">
-          <button
-            type="button"
+        <div className="md:mt-7 flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+          <Button
             onClick={onLink}
             disabled={!!disabled || !hasPetId}
-            className="px-6 py-3 rounded-2xl bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700 transition disabled:opacity-60 disabled:cursor-not-allowed w-full md:w-auto"
+            variant="primary"
+            className="w-full md:w-auto"
           >
             Vincular
-          </button>
+          </Button>
 
           <button
             type="button"
             onClick={onUnlinkById}
             disabled={!!disabled || !hasPetId}
-            className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-red-50 border border-red-100 text-red-700 hover:bg-red-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center w-full sm:w-12 h-12 rounded-2xl bg-red-50 border border-red-100 text-red-700 hover:bg-red-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
             title="Desvincular por ID"
             aria-label="Desvincular por ID"
           >

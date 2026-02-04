@@ -22,7 +22,7 @@ export function Pagination({ currentPage, totalPages, onPage }: PaginationProps)
         type="button"
         onClick={() => onPage(currentPage - 1)}
         disabled={!canPrev}
-        className="px-4 py-2 rounded-xl bg-white/80 border border-slate-200 shadow-sm text-slate-700 font-semibold hover:bg-white transition disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+        className="btn-secondary btn-sm w-full sm:w-auto disabled:opacity-50"
       >
         Anterior
       </button>
@@ -75,7 +75,7 @@ export function Pagination({ currentPage, totalPages, onPage }: PaginationProps)
         type="button"
         onClick={() => onPage(currentPage + 1)}
         disabled={!canNext}
-        className="px-4 py-2 rounded-xl bg-white/80 border border-slate-200 shadow-sm text-slate-700 font-semibold hover:bg-white transition disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+        className="btn-secondary btn-sm w-full sm:w-auto disabled:opacity-50"
       >
         Próxima
       </button>

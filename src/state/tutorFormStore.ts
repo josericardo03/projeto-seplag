@@ -2,6 +2,7 @@ import { BehaviorSubject } from 'rxjs'
 import type { Pet, Tutor } from '../types'
 import { tutorService } from '../services/tutorService'
 import { petService } from '../services/petService'
+import { getErrorMessage } from '../utils/errors'
 
 type Mode = 'create' | 'edit'
 
@@ -54,11 +55,29 @@ function formatCpfBR(value: string) {
   return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
 }
 
-function coerceTutorPhoto(tutor: Tutor | any): { id: number | null; url: string | null } {
-  if (!tutor) return { id: null, url: null }
-  if (typeof tutor.foto === 'string') return { id: null, url: tutor.foto }
-  if (tutor.foto?.url) return { id: Number(tutor.foto.id) || null, url: tutor.foto.url }
-  return { id: null, url: null }
+function coerceTutorPhoto(tutor: Tutor): { id: number | null; url: string | null } {
+  const foto = tutor.foto
+  if (!foto) return { id: null, url: null }
+  if (typeof foto === 'string') return { id: null, url: foto }
+  const id = typeof foto.id === 'number' ? foto.id : Number(foto.id)
+  const safeId = Number.isFinite(id) ? id : null
+  const url = typeof foto.url === 'string' ? foto.url : null
+  return { id: safeId, url }
+}
+
+function readPetsFromUnknown(value: unknown): Pet[] | null {
+  return Array.isArray(value) ? (value as unknown as Pet[]) : null
+}
+
+function getPetsFromTutorLoose(tutor: Tutor): Pet[] | null {
+  // Alguns backends retornam variações de nome: pets, petsVinculados, animais...
+  const rec = tutor as unknown as Record<string, unknown>
+  return (
+    readPetsFromUnknown(rec.pets) ||
+    readPetsFromUnknown(rec.petsVinculados) ||
+    readPetsFromUnknown(rec.animais) ||
+    null
+  )
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
@@ -159,12 +178,8 @@ export function createTutorFormStore() {
     }
     try {
       const tutor = await tutorService.getTutorById(tutorId)
-      const petsFromTutor =
-        (tutor as any).pets ||
-        (tutor as any).petsVinculados ||
-        (tutor as any).animais ||
-        null
-      if (Array.isArray(petsFromTutor)) set({ pets: petsFromTutor })
+      const petsFromTutor = getPetsFromTutorLoose(tutor)
+      if (petsFromTutor) set({ pets: petsFromTutor })
     } catch {
     }
   }
@@ -189,16 +204,11 @@ export function createTutorFormStore() {
         existingPhotoId: photo.id,
       })
 
-      const petsFromTutor =
-        (tutor as any).pets ||
-        (tutor as any).petsVinculados ||
-        (tutor as any).animais ||
-        null
-
-      if (Array.isArray(petsFromTutor)) set({ pets: petsFromTutor })
+      const petsFromTutor = getPetsFromTutorLoose(tutor)
+      if (petsFromTutor) set({ pets: petsFromTutor })
       else await refreshPets(tutorId)
-    } catch (e: any) {
-      set({ error: e?.response?.data?.message || e?.message || 'Erro ao carregar tutor' })
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e, 'Erro ao carregar tutor') })
     } finally {
       set({ initialLoading: false })
     }
@@ -215,8 +225,8 @@ export function createTutorFormStore() {
         existingPhotoUrl: null,
         success: 'Foto removida com sucesso',
       })
-    } catch (e: any) {
-      set({ error: e?.response?.data?.message || e?.message || 'Erro ao remover foto' })
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e, 'Erro ao remover foto') })
     } finally {
       set({ removingPhoto: false })
     }
@@ -250,8 +260,8 @@ export function createTutorFormStore() {
 
       set({ success: s.mode === 'edit' ? 'Tutor atualizado com sucesso' : 'Tutor cadastrado com sucesso' })
       window.setTimeout(() => navigateTo(`/tutores/${saved.id}/editar`), 500)
-    } catch (e: any) {
-      set({ error: e?.response?.data?.message || e?.message || 'Erro ao salvar tutor' })
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e, 'Erro ao salvar tutor') })
     } finally {
       set({ saving: false })
     }
@@ -264,8 +274,8 @@ export function createTutorFormStore() {
       set({ deleting: true, error: null, success: null })
       await tutorService.deleteTutor(s.tutorId)
       navigateTo('/tutores')
-    } catch (e: any) {
-      set({ error: e?.response?.data?.message || e?.message || 'Erro ao excluir tutor' })
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e, 'Erro ao excluir tutor') })
     } finally {
       set({ deleting: false })
     }
@@ -314,10 +324,10 @@ export function createTutorFormStore() {
           void refreshPets(s.tutorId as number)
         }
       })()
-    } catch (e: any) {
+    } catch (e: unknown) {
       set({
         pets: snapshot,
-        error: e?.response?.data?.message || e?.message || 'Erro ao vincular pet',
+        error: getErrorMessage(e, 'Erro ao vincular pet'),
       })
     } finally {
       set({ linking: false })
@@ -336,10 +346,10 @@ export function createTutorFormStore() {
       await tutorService.unlinkPet(s.tutorId, petId)
       await refreshPets(s.tutorId)
       set({ success: 'Vínculo removido com sucesso' })
-    } catch (e: any) {
+    } catch (e: unknown) {
       set({
         pets: snapshot,
-        error: e?.response?.data?.message || e?.message || 'Erro ao remover vínculo',
+        error: getErrorMessage(e, 'Erro ao remover vínculo'),
       })
     } finally {
       set({ linking: false })

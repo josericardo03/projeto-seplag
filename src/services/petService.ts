@@ -1,11 +1,15 @@
 import api from './api'
 import type { Pet, PageableResponse } from '../types'
+import { createAsyncCache } from './asyncCache'
+import { adaptPageableResponse } from '../utils/pageable'
 
 export interface PetListParams {
   page?: number
   size?: number
   nome?: string
 }
+
+const petByIdCache = createAsyncCache<number, Pet>({ ttlMs: 2 * 60_000 })
 
 export const petService = {
   async getPets(params: PetListParams = {}): Promise<PageableResponse<Pet>> {
@@ -26,23 +30,14 @@ export const petService = {
       throw new Error('Resposta da API está vazia')
     }
 
-    const data = response.data as any
-
-    const adaptedResponse: PageableResponse<Pet> = {
-      content: data.content || [],
-      totalElements: data.total ?? data.totalElements ?? 0,
-      totalPages: data.pageCount ?? data.totalPages ?? 0,
-      size: data.size ?? size,
-      number: data.page ?? data.number ?? page,
-      first: (data.page ?? page) === 0,
-      last: (data.page ?? page) >= ((data.pageCount ?? data.totalPages ?? 1) - 1),
-    }
-    return adaptedResponse
+    return adaptPageableResponse<Pet>(response.data, { page, size })
   },
 
   async getPetById(id: number): Promise<Pet> {
-    const response = await api.get<Pet>(`/v1/pets/${id}`)
-    return response.data
+    return await petByIdCache.getOrLoad(id, async () => {
+      const response = await api.get<Pet>(`/v1/pets/${id}`)
+      return response.data
+    })
   },
 
   async createPet(pet: Omit<Pet, 'id'>): Promise<Pet> {
@@ -52,6 +47,7 @@ export const petService = {
 
   async updatePet(id: number, pet: Partial<Pet>): Promise<Pet> {
     const response = await api.put<Pet>(`/v1/pets/${id}`, pet)
+    petByIdCache.invalidate(id)
     return response.data
   },
 
@@ -64,9 +60,15 @@ export const petService = {
         'Content-Type': 'multipart/form-data',
       },
     })
+    petByIdCache.invalidate(petId)
   },
 
   async deletePet(id: number): Promise<void> {
     await api.delete(`/v1/pets/${id}`)
+    petByIdCache.invalidate(id)
+  },
+
+  clearCache(): void {
+    petByIdCache.clear()
   },
 }

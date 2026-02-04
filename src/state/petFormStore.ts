@@ -1,6 +1,7 @@
 import type { Pet } from '../types'
 import { BehaviorSubject } from 'rxjs'
 import { petService } from '../services/petService'
+import { getErrorMessage } from '../utils/errors'
 
 type Mode = 'create' | 'edit'
 
@@ -102,8 +103,8 @@ export function createPetFormStore() {
         raca: pet.raca || '',
         existingPhotoUrl: pet.foto?.url || null,
       })
-    } catch (e: any) {
-      set({ error: e?.response?.data?.message || e?.message || 'Erro ao carregar pet' })
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e, 'Erro ao carregar pet') })
     } finally {
       set({ initialLoading: false })
     }
@@ -159,8 +160,8 @@ export function createPetFormStore() {
 
       set({ success: s.mode === 'edit' ? 'Pet atualizado com sucesso' : 'Pet cadastrado com sucesso' })
       window.setTimeout(() => navigateTo(`/pets/${saved.id}`), 500)
-    } catch (e: any) {
-      set({ error: e?.response?.data?.message || e?.message || 'Erro ao salvar pet' })
+    } catch (e: unknown) {
+      set({ error: getErrorMessage(e, 'Erro ao salvar pet') })
     } finally {
       set({ saving: false })
     }

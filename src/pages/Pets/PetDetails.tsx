@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { PetsHeader } from './components/shared/PetsHeader'
-import { FullPageSpinner, RenderError } from './components/shared/PageStates'
+import { PetsHeader } from '../../components/layout/PetsHeader'
+import { FullPageSpinner, RenderError } from '../../components/ui/PageStates'
 import { usePetDetails } from './hooks/usePetDetails'
 import { SpeciesBadge } from './components/details/SpeciesBadge'
 import { PetMediaCard } from './components/details/PetMediaCard'
 import { PetInfoCard } from './components/details/PetInfoCard'
 import { TutorCard } from './components/details/TutorCard'
 import { petService } from '../../services/petService'
+import { getErrorMessage } from '../../utils/errors'
 
 export default function PetDetails() {
   const navigate = useNavigate()
@@ -71,8 +72,8 @@ export default function PetDetails() {
                   setDeleteError(null)
                   await petService.deletePet(pet.id)
                   navigate('/')
-                } catch (e: any) {
-                  setDeleteError(e?.response?.data?.message || e?.message || 'Erro ao excluir pet')
+                } catch (e: unknown) {
+                  setDeleteError(getErrorMessage(e, 'Erro ao excluir pet'))
                 } finally {
                   setDeleting(false)
                 }

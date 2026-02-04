@@ -12,7 +12,7 @@ export function FormActions(props: {
       <button
         type="button"
         onClick={onCancel}
-        className="px-6 py-3 rounded-2xl bg-white/80 border border-slate-200 text-slate-800 font-semibold shadow-sm hover:bg-white transition"
+        className="px-6 py-3 rounded-2xl bg-white/80 border border-slate-200 text-slate-800 font-semibold shadow-sm hover:bg-white transition disabled:opacity-60 disabled:cursor-not-allowed"
         disabled={isDisabled}
       >
         Cancelar
