@@ -178,7 +178,14 @@ export default function PetForm() {
             />
           </div>
 
-          <FormActions mode={mode} saving={saving} onCancel={cancel} onSubmit={submit} />
+          <FormActions
+            mode={mode}
+            saving={saving}
+            onCancel={cancel}
+            onSubmit={submit}
+            submitLabelCreate="Cadastrar pet"
+            submitLabelEdit="Salvar alterações"
+          />
         </div>
       </main>
     </div>

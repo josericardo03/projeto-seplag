@@ -9,6 +9,7 @@ export function PhotoUploader(props: {
   onChangeRemoveExisting?: (value: boolean) => void
 }) {
   const { existingUrl, file, disabled, onPick, removeExisting, onChangeRemoveExisting } = props
+  const placeholder = '/animal-placeholder.svg'
 
   const localUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file])
   useEffect(() => {
@@ -31,9 +32,12 @@ export function PhotoUploader(props: {
           <img src={previewUrl} alt="Foto do pet" className="w-full aspect-square object-cover" />
         ) : (
           <div className="w-full aspect-square flex items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300">
-            <span className="text-slate-600 font-semibold">
-              {isMarkedForRemoval ? 'Foto será removida' : 'Sem foto'}
-            </span>
+            <div className="flex flex-col items-center gap-3">
+              <img src={placeholder} alt="Pet sem foto" className="w-20 h-20 opacity-80" />
+              <span className="text-slate-600 font-semibold">
+                {isMarkedForRemoval ? 'Foto será removida' : 'Sem foto'}
+              </span>
+            </div>
           </div>
         )}
 

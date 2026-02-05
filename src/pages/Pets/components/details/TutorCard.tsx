@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 
 export function TutorCard({ tutor }: { tutor: Tutor }) {
   const [imageError, setImageError] = useState(false)
+  const placeholder = '/animal-placeholder.svg'
 
   const photoUrl = useMemo(() => {
     const foto = tutor.foto
@@ -34,8 +35,8 @@ export function TutorCard({ tutor }: { tutor: Tutor }) {
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center text-white text-xl font-bold">
-            {tutor.nome.charAt(0).toUpperCase()}
+          <div className="w-14 h-14 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
+            <img src={placeholder} alt="Tutor sem foto" className="w-10 h-10 opacity-90" />
           </div>
         )}
 

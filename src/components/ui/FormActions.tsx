@@ -4,8 +4,10 @@ export function FormActions(props: {
   disabled?: boolean
   onCancel: () => void
   onSubmit: () => void
+  submitLabelCreate?: string
+  submitLabelEdit?: string
 }) {
-  const { mode, saving, disabled, onCancel, onSubmit } = props
+  const { mode, saving, disabled, onCancel, onSubmit, submitLabelCreate, submitLabelEdit } = props
   const isDisabled = saving || !!disabled
   return (
     <div className="flex flex-col-reverse sm:flex-row gap-3 justify-end">
@@ -24,7 +26,11 @@ export function FormActions(props: {
         disabled={isDisabled}
         className="px-6 py-3 rounded-2xl bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {saving ? 'Salvando...' : mode === 'edit' ? 'Salvar alterações' : 'Cadastrar pet'}
+        {saving
+          ? 'Salvando...'
+          : mode === 'edit'
+            ? submitLabelEdit || 'Salvar alterações'
+            : submitLabelCreate || 'Cadastrar'}
       </button>
     </div>
   )

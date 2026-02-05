@@ -23,7 +23,12 @@ export function PetsHeader() {
           <Link to="/" className="flex items-center gap-3 transition-transform hover:scale-[1.02] no-underline">
             <div className="w-12 h-12 rounded-xl bg-white/20 border border-white/20 flex items-center justify-center shadow">
               <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                {/* Patinha (paw) */}
+                <circle cx="7.5" cy="9" r="1.6" />
+                <circle cx="10.2" cy="6.6" r="1.6" />
+                <circle cx="13.8" cy="6.6" r="1.6" />
+                <circle cx="16.5" cy="9" r="1.6" />
+                <path d="M12 11c-2.7 0-4.9 1.9-4.9 4.2 0 1.6 1.3 2.9 2.9 2.9.8 0 1.5-.2 2-.6.5.4 1.2.6 2 .6 1.6 0 2.9-1.3 2.9-2.9C16.9 12.9 14.7 11 12 11z" />
               </svg>
             </div>
             <div className="leading-tight">
@@ -35,15 +40,15 @@ export function PetsHeader() {
           {isAuthenticated ? (
             <div className="flex items-center gap-2 flex-wrap">
               <nav className="flex items-center gap-1 p-1 rounded-2xl bg-white/10 border border-white/15">
-                <Link to="/lobby" className={navItem(pathname.startsWith('/lobby'))}>
-                  Lobby
-                </Link>
                 <NavLink to="/" className={() => navItem(isPetsActive)} aria-current={isPetsActive ? 'page' : undefined}>
                   Pets
                 </NavLink>
                 <NavLink to="/tutores" className={({ isActive }) => navItem(isActive)}>
                   Tutores
                 </NavLink>
+                <Link to="/lobby" className={navItem(pathname.startsWith('/lobby'))}>
+                  Lobby
+                </Link>
               </nav>
 
               <button

@@ -10,12 +10,17 @@ function initials(name: string) {
 
 export function TutorCard({ tutor }: { tutor: Tutor }) {
   const photoUrl = typeof tutor.foto === 'string' ? tutor.foto : tutor.foto?.url
+  const placeholder = '/animal-placeholder.svg'
   return (
     <div className="bg-white/80 backdrop-blur rounded-3xl shadow-xl border border-black/5 p-6 flex flex-col gap-4">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-4 min-w-0">
           <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center text-white font-extrabold shrink-0">
-            {photoUrl ? <img src={photoUrl} alt={tutor.nome} className="w-full h-full object-cover" /> : initials(tutor.nome)}
+            {photoUrl ? (
+              <img src={photoUrl} alt={tutor.nome} className="w-full h-full object-cover" />
+            ) : (
+              <img src={placeholder} alt="Tutor sem foto" className="w-full h-full object-contain p-2 bg-white/20" />
+            )}
           </div>
           <div className="min-w-0">
             <p className="text-slate-900 font-extrabold truncate">{tutor.nome}</p>

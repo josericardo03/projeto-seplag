@@ -12,31 +12,27 @@ function especieBadgeClass(especie?: string) {
 export function PetCard({ pet }: { pet: Pet }) {
   const [imgError, setImgError] = useState(false)
   const hasImage = !!pet.foto?.url && !imgError
+  const placeholder = '/animal-placeholder.svg'
 
   return (
     <Link
       to={`/pets/${pet.id}`}
       className="group block bg-white rounded-3xl shadow-md overflow-hidden cursor-pointer transition-all duration-300 border border-black/5 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl"
     >
-      <div className="relative h-56 bg-gradient-to-r from-indigo-500 to-purple-600 overflow-hidden">
+      <div className="relative h-56 bg-slate-100 overflow-hidden">
         {hasImage ? (
           <img
             src={pet.foto!.url}
             alt={pet.nome}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-indigo-500/80 to-purple-600/80">
-            <svg className="w-16 h-16 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
+          <img
+            src={placeholder}
+            alt="Pet sem foto"
+            className="w-full h-full object-contain p-10 opacity-90"
+          />
         )}
 
         {pet.especie && (

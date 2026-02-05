@@ -13,8 +13,8 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
 
-  const state = location.state as { from?: { pathname?: string } } | null
-  const from = state?.from?.pathname || '/'
+  // Regra do projeto: após logar, sempre ir para Pets
+  const from = '/'
 
   if (!isLoading && isAuthenticated) return <Navigate to={from} replace />
 

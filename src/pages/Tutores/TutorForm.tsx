@@ -192,13 +192,15 @@ export default function TutorForm() {
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end">
             <FormActions
               mode={mode}
               saving={saving}
               onCancel={cancel}
               onSubmit={submit}
               disabled={linking || deleting}
+              submitLabelCreate="Cadastrar tutor"
+              submitLabelEdit="Salvar alterações"
             />
 
             {mode === 'edit' && tutorId && (

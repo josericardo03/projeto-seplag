@@ -43,6 +43,7 @@ export function TutorPetsLinker(props: {
         }
 
   const linkedIds = useMemo(() => new Set(pets.map((p) => p.id)), [pets])
+  const placeholder = '/animal-placeholder.svg'
 
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(0)
@@ -176,7 +177,9 @@ export function TutorPetsLinker(props: {
                     {getPetPhotoUrl(pet) ? (
                       <img src={getPetPhotoUrl(pet)!} alt={pet.nome} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-500 font-bold">🐾</div>
+                      <div className="w-full h-full flex items-center justify-center">
+                        <img src={placeholder} alt="Pet sem foto" className="w-10 h-10 opacity-80" />
+                      </div>
                     )}
                   </div>
 

@@ -3,6 +3,7 @@ import { useState } from 'react'
 export function PetMediaCard({ name, imageUrl }: { name: string; imageUrl?: string | null }) {
   const [imgError, setImgError] = useState(false)
   const hasImage = !!imageUrl && !imgError
+  const placeholder = '/animal-placeholder.svg'
 
   return (
     <div className="relative rounded-3xl overflow-hidden shadow-lg bg-slate-200 border border-black/5">
@@ -14,8 +15,8 @@ export function PetMediaCard({ name, imageUrl }: { name: string; imageUrl?: stri
           onError={() => setImgError(true)}
         />
       ) : (
-        <div className="aspect-square flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-700">
-          <span className="text-white text-6xl">🐾</span>
+        <div className="aspect-square flex items-center justify-center bg-slate-100">
+          <img src={placeholder} alt="Pet sem foto" className="w-40 max-w-[60%] opacity-90" />
         </div>
       )}
 
