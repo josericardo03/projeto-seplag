@@ -34,18 +34,14 @@ export default function TutorForm() {
     cpf,
     onChangeCpf,
     existingPhotoUrl,
-    existingPhotoId,
     photoFile,
     onPickPhoto,
     removeExistingPhotoOnSave,
     setRemoveExistingPhotoOnSave,
     pets,
     petsLoading,
-    petIdText,
-    setPetIdText,
-    linkPet,
+    linkPetById,
     unlinkPet,
-    unlinkPetByInput,
     submit,
     deleteTutor,
     cancel,
@@ -227,12 +223,8 @@ export default function TutorForm() {
             tutorId={tutorId}
             pets={pets}
             petsLoading={petsLoading}
-            petIdText={petIdText}
-            petIdError={fieldErrors.petId}
             disabled={saving || linking}
-            onChangePetId={setPetIdText}
-            onLink={linkPet}
-            onUnlinkById={unlinkPetByInput}
+            onLinkById={linkPetById}
             onUnlink={unlinkPet}
           />
         )}

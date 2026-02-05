@@ -270,16 +270,9 @@ export function createTutorFormStore() {
     }
   }
 
-  async function linkPet() {
+  async function linkPetById(petId: number) {
     const s = subject.getValue()
     if (!s.tutorId) return
-    const raw = onlyDigits(s.petIdText)
-    if (!raw) {
-      set({ fieldErrors: { ...s.fieldErrors, petId: 'Informe o ID do pet' } })
-      return
-    }
-    const petId = Number(raw)
-    if (!Number.isFinite(petId)) return
 
     const snapshot = subject.getValue().pets
     if (!snapshot.some((p) => p.id === petId)) {
@@ -321,6 +314,19 @@ export function createTutorFormStore() {
     } finally {
       set({ linking: false })
     }
+  }
+
+  async function linkPet() {
+    const s = subject.getValue()
+    if (!s.tutorId) return
+    const raw = onlyDigits(s.petIdText)
+    if (!raw) {
+      set({ fieldErrors: { ...s.fieldErrors, petId: 'Informe o ID do pet' } })
+      return
+    }
+    const petId = Number(raw)
+    if (!Number.isFinite(petId)) return
+    await linkPetById(petId)
   }
 
   async function unlinkPet(petId: number) {
@@ -373,6 +379,7 @@ export function createTutorFormStore() {
     setPetIdText: (value: string) => set({ petIdText: value }),
     submit,
     deleteTutor,
+    linkPetById,
     linkPet,
     unlinkPet,
     unlinkPetByInput,

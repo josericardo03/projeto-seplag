@@ -61,11 +61,8 @@ export function useTutorForm() {
 
     pets: snap.pets,
     petsLoading: snap.petsLoading,
-    petIdText: snap.petIdText,
-    setPetIdText: store.setPetIdText,
-    linkPet: store.linkPet,
+    linkPetById: store.linkPetById,
     unlinkPet: store.unlinkPet,
-    unlinkPetByInput: store.unlinkPetByInput,
 
     submit: () => store.submit((path) => navigate(path)),
     deleteTutor: () => store.deleteTutor((path) => navigate(path)),
