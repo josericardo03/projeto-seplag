@@ -5,13 +5,13 @@ export function PetsListHero(props: {
 }) {
   const { onAdd, onViewTutores, disabled } = props
   return (
-    <div className="mb-10 flex flex-col gap-5">
+    <div className="mb-8 flex flex-col gap-5">
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
         <div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent mb-3 leading-tight">
-            Nossos <span className="bg-gradient-to-r from-pink-400 to-red-500 bg-clip-text text-transparent">Pets</span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-stone-800 tracking-tight mb-2">
+            Nossos Pets
           </h2>
-          <p className="text-gray-600 text-lg sm:text-xl font-normal leading-relaxed">
+          <p className="text-stone-600 text-base sm:text-lg leading-relaxed max-w-xl">
             Gerencie todos os seus amiguinhos em um só lugar
           </p>
         </div>
@@ -22,10 +22,10 @@ export function PetsListHero(props: {
             onClick={onAdd}
             disabled={!!disabled}
             className={[
-              'px-8 py-3.5 rounded-2xl font-semibold text-base shadow-lg transition-all duration-300',
+              'px-6 py-3 rounded-xl text-sm font-semibold transition-colors',
               disabled
-                ? 'bg-slate-300 text-slate-700 cursor-not-allowed shadow-sm'
-                : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:-translate-y-0.5 hover:shadow-xl',
+                ? 'bg-stone-200 text-stone-500 cursor-not-allowed'
+                : 'bg-teal-600 text-white hover:bg-teal-700',
             ].join(' ')}
           >
             + Cadastrar Pet {disabled ? '(em breve)' : ''}
@@ -34,7 +34,7 @@ export function PetsListHero(props: {
           <button
             type="button"
             onClick={onViewTutores}
-            className="px-7 py-3.5 rounded-2xl font-semibold text-base border border-indigo-100 bg-white/80 text-indigo-700 shadow-sm hover:bg-white hover:border-indigo-200 transition"
+            className="px-5 py-3 rounded-xl text-sm font-medium border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 transition-colors"
           >
             Ver Tutores
           </button>
