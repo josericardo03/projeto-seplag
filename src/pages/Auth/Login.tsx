@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { getErrorMessage } from '../../utils/errors'
@@ -18,7 +18,10 @@ export default function Login() {
 
   if (!isLoading && isAuthenticated) return <Navigate to={from} replace />
 
-  const onSubmit = async () => {
+  const hasError = !!(localError || error)
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setLocalError(null)
     if (!username.trim() || !password) {
       setLocalError('Informe usuário e senha')
@@ -28,8 +31,8 @@ export default function Login() {
       setSubmitting(true)
       await login(username.trim(), password)
       navigate(from, { replace: true })
-    } catch (e: unknown) {
-      setLocalError(getErrorMessage(e, 'Falha ao autenticar'))
+    } catch (err: unknown) {
+      setLocalError(getErrorMessage(err, 'Falha ao autenticar'))
     } finally {
       setSubmitting(false)
     }
@@ -48,13 +51,18 @@ export default function Login() {
           </div>
         </div>
 
-        {(localError || error) && (
-          <div className="mb-5 px-4 py-3 rounded-2xl bg-red-50 border border-red-100 text-red-700 font-semibold text-sm">
+        {hasError && (
+          <div
+            id="login-error"
+            role="alert"
+            aria-live="assertive"
+            className="mb-5 px-4 py-3 rounded-2xl bg-red-50 border border-red-100 text-red-700 font-semibold text-sm"
+          >
             {localError || error}
           </div>
         )}
 
-        <div className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4" noValidate>
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-800" htmlFor="username">
               Usuário
@@ -67,7 +75,8 @@ export default function Login() {
               placeholder="Digite seu usuário"
               autoComplete="username"
               disabled={submitting}
-              onKeyDown={(e) => e.key === 'Enter' && onSubmit()}
+              aria-invalid={hasError}
+              aria-describedby={hasError ? 'login-error' : undefined}
             />
           </div>
 
@@ -84,19 +93,19 @@ export default function Login() {
               placeholder="Digite sua senha"
               autoComplete="current-password"
               disabled={submitting}
-              onKeyDown={(e) => e.key === 'Enter' && onSubmit()}
+              aria-invalid={hasError}
+              aria-describedby={hasError ? 'login-error' : undefined}
             />
           </div>
 
           <button
-            type="button"
-            onClick={onSubmit}
+            type="submit"
             disabled={submitting}
             className="w-full px-6 py-3 rounded-2xl bg-indigo-600 text-white font-semibold shadow-sm hover:bg-indigo-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {submitting ? 'Entrando...' : 'Entrar'}
           </button>
-        </div>
+        </form>
 
       </div>
     </main>
