@@ -56,8 +56,8 @@ export function useTutorForm() {
     existingPhotoId: snap.existingPhotoId,
     photoFile: snap.photoFile,
     onPickPhoto: store.onPickPhoto,
-    removeExistingPhoto: store.removeExistingPhoto,
-    removingPhoto: snap.removingPhoto,
+    removeExistingPhotoOnSave: snap.removeExistingPhotoOnSave,
+    setRemoveExistingPhotoOnSave: store.setRemoveExistingPhotoOnSave,
 
     pets: snap.pets,
     petsLoading: snap.petsLoading,

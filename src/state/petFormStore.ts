@@ -10,7 +10,6 @@ type PetFormState = {
   petId: number | null
   initialLoading: boolean
   saving: boolean
-  removingPhoto: boolean
   error: string | null
   success: string | null
   fieldErrors: Record<string, string>
@@ -23,6 +22,7 @@ type PetFormState = {
   existingPhotoUrl: string | null
   existingPhotoId: number | null
   photoFile: File | null
+  removeExistingPhotoOnSave: boolean
 }
 
 function onlyDigits(value: string) {
@@ -57,7 +57,6 @@ export function createPetFormStore() {
     petId: null,
     initialLoading: false,
     saving: false,
-    removingPhoto: false,
     error: null,
     success: null,
     fieldErrors: {},
@@ -68,6 +67,7 @@ export function createPetFormStore() {
     existingPhotoUrl: null,
     existingPhotoId: null,
     photoFile: null,
+    removeExistingPhotoOnSave: false,
   })
 
   function set(patch: Partial<PetFormState>) {
@@ -80,7 +80,6 @@ export function createPetFormStore() {
       petId,
       initialLoading,
       saving: false,
-      removingPhoto: false,
       error: null,
       success: null,
       fieldErrors: {},
@@ -91,6 +90,7 @@ export function createPetFormStore() {
       existingPhotoUrl: null,
       existingPhotoId: null,
       photoFile: null,
+      removeExistingPhotoOnSave: false,
     })
   }
 
@@ -109,6 +109,8 @@ export function createPetFormStore() {
         raca: pet.raca || '',
         existingPhotoUrl: pet.foto?.url || null,
         existingPhotoId: typeof pet.foto?.id === 'number' ? pet.foto.id : null,
+        photoFile: null,
+        removeExistingPhotoOnSave: false,
       })
     } catch (e: unknown) {
       set({ error: getErrorMessage(e, 'Erro ao carregar pet') })
@@ -117,18 +119,15 @@ export function createPetFormStore() {
     }
   }
 
-  async function removeExistingPhoto() {
+  function onPickPhoto(file: File | null) {
+    // Se escolher nova foto, não faz sentido manter a remoção do existente marcada
+    set({ photoFile: file, removeExistingPhotoOnSave: file ? false : subject.getValue().removeExistingPhotoOnSave })
+  }
+
+  function setRemoveExistingPhotoOnSave(value: boolean) {
     const s = subject.getValue()
-    if (!s.petId || !s.existingPhotoId) return
-    try {
-      set({ removingPhoto: true, error: null, success: null })
-      await petService.deletePhoto(s.petId, s.existingPhotoId)
-      set({ existingPhotoId: null, existingPhotoUrl: null, success: 'Foto removida com sucesso' })
-    } catch (e: unknown) {
-      set({ error: getErrorMessage(e, 'Erro ao remover foto') })
-    } finally {
-      set({ removingPhoto: false })
-    }
+    const canMark = !!s.existingPhotoId && !!s.existingPhotoUrl && !s.photoFile
+    set({ removeExistingPhotoOnSave: canMark ? value : false })
   }
 
   function validate() {
@@ -175,6 +174,12 @@ export function createPetFormStore() {
         saved = await petService.createPet(payload)
       }
 
+      // Remoção remota da foto: só ocorre ao salvar.
+      if (s.mode === 'edit' && s.petId && s.removeExistingPhotoOnSave && s.existingPhotoId) {
+        await petService.deletePhoto(s.petId, s.existingPhotoId)
+        set({ existingPhotoId: null, existingPhotoUrl: null, removeExistingPhotoOnSave: false })
+      }
+
       if (s.photoFile) {
         await petService.uploadPhoto(saved.id, s.photoFile)
       }
@@ -196,8 +201,8 @@ export function createPetFormStore() {
     setEspecie: (value: string) => set({ especie: value }),
     setRaca: (value: string) => set({ raca: value }),
     onChangeIdade,
-    onPickPhoto: (file: File | null) => set({ photoFile: file }),
-    removeExistingPhoto,
+    onPickPhoto,
+    setRemoveExistingPhotoOnSave,
     submit,
   } as const
 }

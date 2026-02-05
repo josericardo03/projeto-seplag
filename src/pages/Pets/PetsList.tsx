@@ -36,14 +36,12 @@ export default function PetsList() {
     reload,
     speciesFilter,
     setSpeciesFilter,
+    breedFilter,
+    setBreedFilter,
     ageMinText,
     setAgeMinText,
     ageMaxText,
     setAgeMaxText,
-    hasPhoto,
-    setHasPhoto,
-    hasTutor,
-    setHasTutor,
     clearFilters,
     filtersActive,
   } = usePetsList({ pageSize: 10, pollingMs: 10_000 })
@@ -107,7 +105,7 @@ export default function PetsList() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
             <div className="lg:col-span-2">
               <label className="block text-xs font-bold text-slate-700 mb-2" htmlFor="speciesFilter">
                 Espécie
@@ -117,6 +115,20 @@ export default function PetsList() {
                 value={speciesFilter}
                 onChange={(e) => setSpeciesFilter(e.target.value)}
                 placeholder="Ex.: Gato, Cachorro"
+                className="block w-full px-4 py-3 rounded-2xl bg-white/90 border border-slate-200 shadow-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                disabled={loading}
+              />
+            </div>
+
+            <div className="lg:col-span-2">
+              <label className="block text-xs font-bold text-slate-700 mb-2" htmlFor="breedFilter">
+                Raça
+              </label>
+              <input
+                id="breedFilter"
+                value={breedFilter}
+                onChange={(e) => setBreedFilter(e.target.value)}
+                placeholder="Ex.: Poodle, Vira-lata"
                 className="block w-full px-4 py-3 rounded-2xl bg-white/90 border border-slate-200 shadow-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 disabled={loading}
               />
@@ -150,29 +162,6 @@ export default function PetsList() {
                 className="block w-full px-4 py-3 rounded-2xl bg-white/90 border border-slate-200 shadow-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 disabled={loading}
               />
-            </div>
-
-            <div className="flex flex-col justify-end gap-3">
-              <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800 select-none">
-                <input
-                  type="checkbox"
-                  checked={hasPhoto}
-                  onChange={(e) => setHasPhoto(e.target.checked)}
-                  disabled={loading}
-                  className="w-4 h-4 accent-indigo-600"
-                />
-                Com foto
-              </label>
-              <label className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800 select-none">
-                <input
-                  type="checkbox"
-                  checked={hasTutor}
-                  onChange={(e) => setHasTutor(e.target.checked)}
-                  disabled={loading}
-                  className="w-4 h-4 accent-indigo-600"
-                />
-                Com tutor
-              </label>
             </div>
           </div>
         </div>

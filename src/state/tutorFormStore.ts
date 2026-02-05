@@ -13,7 +13,6 @@ export type TutorFormState = {
   saving: boolean
   linking: boolean
   deleting: boolean
-  removingPhoto: boolean
   error: string | null
   success: string | null
   fieldErrors: Record<string, string>
@@ -27,6 +26,7 @@ export type TutorFormState = {
   existingPhotoUrl: string | null
   existingPhotoId: number | null
   photoFile: File | null
+  removeExistingPhotoOnSave: boolean
 
   pets: Pet[]
   petsLoading: boolean
@@ -98,7 +98,6 @@ export function createTutorFormStore() {
     saving: false,
     linking: false,
     deleting: false,
-    removingPhoto: false,
     error: null,
     success: null,
     fieldErrors: {},
@@ -110,6 +109,7 @@ export function createTutorFormStore() {
     existingPhotoUrl: null,
     existingPhotoId: null,
     photoFile: null,
+    removeExistingPhotoOnSave: false,
     pets: [],
     petsLoading: false,
     petIdText: '',
@@ -127,7 +127,6 @@ export function createTutorFormStore() {
       saving: false,
       linking: false,
       deleting: false,
-      removingPhoto: false,
       error: null,
       success: null,
       fieldErrors: {},
@@ -139,6 +138,7 @@ export function createTutorFormStore() {
       existingPhotoUrl: null,
       existingPhotoId: null,
       photoFile: null,
+      removeExistingPhotoOnSave: false,
       pets: [],
       petsLoading: false,
       petIdText: '',
@@ -202,6 +202,8 @@ export function createTutorFormStore() {
         cpf: tutor.cpf ? formatCpfBR(String(tutor.cpf)) : '',
         existingPhotoUrl: photo.url,
         existingPhotoId: photo.id,
+        photoFile: null,
+        removeExistingPhotoOnSave: false,
       })
 
       const petsFromTutor = getPetsFromTutorLoose(tutor)
@@ -214,22 +216,15 @@ export function createTutorFormStore() {
     }
   }
 
-  async function removeExistingPhoto() {
+  function onPickPhoto(file: File | null) {
+    // Se escolher nova foto, não faz sentido manter a remoção do existente marcada.
+    set({ photoFile: file, removeExistingPhotoOnSave: file ? false : subject.getValue().removeExistingPhotoOnSave })
+  }
+
+  function setRemoveExistingPhotoOnSave(value: boolean) {
     const s = subject.getValue()
-    if (!s.tutorId || !s.existingPhotoId) return
-    try {
-      set({ removingPhoto: true, error: null })
-      await tutorService.deletePhoto(s.tutorId, s.existingPhotoId)
-      set({
-        existingPhotoId: null,
-        existingPhotoUrl: null,
-        success: 'Foto removida com sucesso',
-      })
-    } catch (e: unknown) {
-      set({ error: getErrorMessage(e, 'Erro ao remover foto') })
-    } finally {
-      set({ removingPhoto: false })
-    }
+    const canMark = !!s.existingPhotoId && !!s.existingPhotoUrl && !s.photoFile
+    set({ removeExistingPhotoOnSave: canMark ? value : false })
   }
 
   async function submit(navigateTo: (path: string) => void) {
@@ -252,6 +247,12 @@ export function createTutorFormStore() {
         saved = await tutorService.updateTutor(s.tutorId, payload)
       } else {
         saved = await tutorService.createTutor(payload)
+      }
+
+      // Remoção remota da foto: só ocorre ao salvar.
+      if (s.mode === 'edit' && s.tutorId && s.removeExistingPhotoOnSave && s.existingPhotoId) {
+        await tutorService.deletePhoto(s.tutorId, s.existingPhotoId)
+        set({ existingPhotoId: null, existingPhotoUrl: null, removeExistingPhotoOnSave: false })
       }
 
       if (s.photoFile) {
@@ -379,8 +380,8 @@ export function createTutorFormStore() {
     onChangeTelefone: (value: string) => set({ telefone: formatPhoneBR(value) }),
     setEndereco: (value: string) => set({ endereco: value }),
     onChangeCpf: (value: string) => set({ cpf: formatCpfBR(value) }),
-    onPickPhoto: (file: File | null) => set({ photoFile: file }),
-    removeExistingPhoto,
+    onPickPhoto,
+    setRemoveExistingPhotoOnSave,
     setPetIdText: (value: string) => set({ petIdText: value }),
     submit,
     deleteTutor,

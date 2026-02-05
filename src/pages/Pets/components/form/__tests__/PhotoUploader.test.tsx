@@ -3,21 +3,21 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { PhotoUploader } from '../PhotoUploader'
 
 describe('PhotoUploader', () => {
-  it('mostra botão de remover remoto e chama onRemoveRemote', () => {
-    const onRemoveRemote = vi.fn()
+  it('ao clicar no X marca remoção para salvar', () => {
+    const onChangeRemoveExisting = vi.fn()
 
     render(
       <PhotoUploader
         existingUrl="http://img"
-        existingId={10}
         file={null}
         onPick={vi.fn()}
-        onRemoveRemote={onRemoveRemote}
+        removeExisting={false}
+        onChangeRemoveExisting={onChangeRemoveExisting}
       />
     )
 
-    fireEvent.click(screen.getByText('Remover do pet'))
-    expect(onRemoveRemote).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: 'Remover foto' }))
+    expect(onChangeRemoveExisting).toHaveBeenCalledWith(true)
   })
 })
 

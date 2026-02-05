@@ -1,13 +1,13 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { createPetFormStore } from '../petFormStore'
 
-const mockPetService = {
+const mockPetService = vi.hoisted(() => ({
   getPetById: vi.fn(),
   createPet: vi.fn(),
   updatePet: vi.fn(),
   uploadPhoto: vi.fn(),
   deletePhoto: vi.fn(),
-}
+}))
 
 vi.mock('../../services/petService', () => ({
   petService: mockPetService,
@@ -18,26 +18,27 @@ describe('petFormStore', () => {
     vi.clearAllMocks()
   })
 
-  it('removeExistingPhoto chama deletePhoto e limpa estado', async () => {
+  it('submit em editar com remoção marcada chama deletePhoto', async () => {
     mockPetService.getPetById.mockResolvedValueOnce({
       id: 10,
       nome: 'Rex',
       idade: 3,
       foto: { id: 77, nome: 'x', contentType: 'image/png', url: 'http://img' },
     })
+    mockPetService.updatePet.mockResolvedValueOnce({ id: 10, nome: 'Rex', idade: 3 })
     mockPetService.deletePhoto.mockResolvedValueOnce(undefined)
 
     const store = createPetFormStore()
     store.reset('edit', 10, true)
     await store.loadPet(10)
 
-    await store.removeExistingPhoto()
+    store.setRemoveExistingPhotoOnSave(true)
+    await store.submit(() => {})
 
     expect(mockPetService.deletePhoto).toHaveBeenCalledWith(10, 77)
     const snap = store.subject.getValue()
     expect(snap.existingPhotoId).toBe(null)
     expect(snap.existingPhotoUrl).toBe(null)
-    expect(snap.success).toContain('Foto removida')
   })
 
   it('submit com foto chama uploadPhoto depois de criar pet', async () => {

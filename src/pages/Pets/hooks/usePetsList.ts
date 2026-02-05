@@ -26,12 +26,11 @@ export function usePetsList(options: UsePetsListOptions = {}) {
   const filters = useMemo(
     () => ({
       speciesFilter: snap.speciesFilter,
+      breedFilter: snap.breedFilter,
       ageMinText: snap.ageMinText,
       ageMaxText: snap.ageMaxText,
-      hasPhoto: snap.hasPhoto,
-      hasTutor: snap.hasTutor,
     }),
-    [snap.ageMaxText, snap.ageMinText, snap.hasPhoto, snap.hasTutor, snap.speciesFilter]
+    [snap.ageMaxText, snap.ageMinText, snap.breedFilter, snap.speciesFilter]
   )
 
   const petsFiltered = useMemo(() => applyPetFilters(snap.pets, filters), [snap.pets, filters])
@@ -72,14 +71,12 @@ export function usePetsList(options: UsePetsListOptions = {}) {
 
     speciesFilter: snap.speciesFilter,
     setSpeciesFilter: petsListStore.setSpeciesFilter,
+    breedFilter: snap.breedFilter,
+    setBreedFilter: petsListStore.setBreedFilter,
     ageMinText: snap.ageMinText,
     setAgeMinText: petsListStore.setAgeMinText,
     ageMaxText: snap.ageMaxText,
     setAgeMaxText: petsListStore.setAgeMaxText,
-    hasPhoto: snap.hasPhoto,
-    setHasPhoto: petsListStore.setHasPhoto,
-    hasTutor: snap.hasTutor,
-    setHasTutor: petsListStore.setHasTutor,
     clearFilters: petsListStore.clearFilters,
     filtersActive,
   }

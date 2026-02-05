@@ -3,19 +3,18 @@ import { applyPetFilters, applyTutorFilters, hasActivePetFilters, hasActiveTutor
 import type { Pet, Tutor } from '../../types'
 
 describe('filters', () => {
-  it('applyPetFilters filtra por espécie, idade, foto e tutor', () => {
+  it('applyPetFilters filtra por espécie, raça e idade', () => {
     const list: Pet[] = [
-      { id: 1, nome: 'Rex', especie: 'Cachorro', idade: 3, foto: { id: 1, nome: 'x', contentType: 'x', url: 'x' }, tutores: [{ id: 1, nome: 'T' }] },
+      { id: 1, nome: 'Rex', especie: 'Cachorro', raca: 'Poodle', idade: 3, foto: { id: 1, nome: 'x', contentType: 'x', url: 'x' }, tutores: [{ id: 1, nome: 'T' }] },
       { id: 2, nome: 'Mimi', especie: 'Gato', idade: 1, foto: null, tutores: [] },
-      { id: 3, nome: 'Bob', especie: 'Cachorro', idade: 10, foto: { id: 2, nome: 'y', contentType: 'y', url: '' }, tutores: [{ id: 2, nome: 'U' }] },
+      { id: 3, nome: 'Bob', especie: 'Cachorro', raca: 'Labrador', idade: 10, foto: { id: 2, nome: 'y', contentType: 'y', url: '' }, tutores: [{ id: 2, nome: 'U' }] },
     ]
 
     const res = applyPetFilters(list, {
       speciesFilter: 'cach',
+      breedFilter: 'poo',
       ageMinText: '2',
       ageMaxText: '9',
-      hasPhoto: true,
-      hasTutor: true,
     })
 
     expect(res.map((p) => p.id)).toEqual([1])
@@ -34,9 +33,10 @@ describe('filters', () => {
 
   it('hasActivePetFilters e hasActiveTutorFilters detectam filtros ativos', () => {
     expect(
-      hasActivePetFilters({ speciesFilter: '', ageMinText: '', ageMaxText: '', hasPhoto: false, hasTutor: false })
+      hasActivePetFilters({ speciesFilter: '', breedFilter: '', ageMinText: '', ageMaxText: '' })
     ).toBe(false)
-    expect(hasActivePetFilters({ speciesFilter: 'Gato', ageMinText: '', ageMaxText: '', hasPhoto: false, hasTutor: false })).toBe(true)
+    expect(hasActivePetFilters({ speciesFilter: 'Gato', breedFilter: '', ageMinText: '', ageMaxText: '' })).toBe(true)
+    expect(hasActivePetFilters({ speciesFilter: '', breedFilter: 'Poodle', ageMinText: '', ageMaxText: '' })).toBe(true)
     expect(hasActiveTutorFilters({ hasEmail: false, hasPhone: false, hasCpf: false, hasPhoto: false })).toBe(false)
     expect(hasActiveTutorFilters({ hasEmail: true, hasPhone: false, hasCpf: false, hasPhoto: false })).toBe(true)
   })

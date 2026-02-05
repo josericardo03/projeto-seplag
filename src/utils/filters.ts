@@ -17,14 +17,14 @@ function normalizeText(value: string) {
 
 export type PetFilters = {
   speciesFilter: string
+  breedFilter: string
   ageMinText: string
   ageMaxText: string
-  hasPhoto: boolean
-  hasTutor: boolean
 }
 
 export function applyPetFilters(list: Pet[], filters: PetFilters): Pet[] {
   const species = normalizeText(filters.speciesFilter)
+  const breed = normalizeText(filters.breedFilter)
   const minAge = parseNumberText(filters.ageMinText)
   const maxAge = parseNumberText(filters.ageMaxText)
 
@@ -32,6 +32,11 @@ export function applyPetFilters(list: Pet[], filters: PetFilters): Pet[] {
     if (species) {
       const s = normalizeText(pet.especie || '')
       if (!s.includes(species)) return false
+    }
+
+    if (breed) {
+      const b = normalizeText(pet.raca || '')
+      if (!b.includes(breed)) return false
     }
 
     if (minAge !== null) {
@@ -42,16 +47,6 @@ export function applyPetFilters(list: Pet[], filters: PetFilters): Pet[] {
     if (maxAge !== null) {
       if (!Number.isFinite(pet.idade)) return false
       if (pet.idade > maxAge) return false
-    }
-
-    if (filters.hasPhoto) {
-      const has = !!pet.foto?.url
-      if (!has) return false
-    }
-
-    if (filters.hasTutor) {
-      const has = (pet.tutores?.length ?? 0) > 0 || typeof pet.tutorId === 'number'
-      if (!has) return false
     }
 
     return true
@@ -86,10 +81,9 @@ export function applyTutorFilters(list: Tutor[], filters: TutorFilters): Tutor[]
 export function hasActivePetFilters(filters: PetFilters) {
   return (
     !!filters.speciesFilter.trim() ||
+    !!filters.breedFilter.trim() ||
     !!filters.ageMinText.trim() ||
-    !!filters.ageMaxText.trim() ||
-    !!filters.hasPhoto ||
-    !!filters.hasTutor
+    !!filters.ageMaxText.trim()
   )
 }
 

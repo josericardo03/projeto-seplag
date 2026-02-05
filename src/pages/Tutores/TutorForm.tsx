@@ -35,8 +35,8 @@ export default function TutorForm() {
     existingPhotoId,
     photoFile,
     onPickPhoto,
-    removeExistingPhoto,
-    removingPhoto,
+    removeExistingPhotoOnSave,
+    setRemoveExistingPhotoOnSave,
     pets,
     petsLoading,
     petIdText,
@@ -159,12 +159,11 @@ export default function TutorForm() {
             <h2 className="text-lg font-bold text-slate-900">Foto</h2>
             <TutorPhotoUploader
               existingUrl={existingPhotoUrl}
-              existingId={existingPhotoId}
               file={photoFile}
               disabled={saving || linking}
               onPick={onPickPhoto}
-              onRemoveRemote={mode === 'edit' ? removeExistingPhoto : undefined}
-              removingRemote={removingPhoto}
+              removeExisting={mode === 'edit' ? removeExistingPhotoOnSave : false}
+              onChangeRemoveExisting={mode === 'edit' ? setRemoveExistingPhotoOnSave : undefined}
             />
           </div>
 
@@ -174,7 +173,7 @@ export default function TutorForm() {
               saving={saving}
               onCancel={cancel}
               onSubmit={submit}
-              disabled={linking || removingPhoto || deleting}
+              disabled={linking || deleting}
             />
 
             {mode === 'edit' && tutorId && (
@@ -185,7 +184,7 @@ export default function TutorForm() {
                   if (!ok) return
                   void deleteTutor()
                 }}
-                disabled={saving || linking || removingPhoto || deleting}
+                disabled={saving || linking || deleting}
                 className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-red-600 text-white font-semibold shadow-sm hover:bg-red-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {deleting ? 'Excluindo...' : 'Excluir tutor'}

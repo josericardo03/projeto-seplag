@@ -28,8 +28,8 @@ export default function PetForm() {
     existingPhotoId,
     photoFile,
     onPickPhoto,
-    removeExistingPhoto,
-    removingPhoto,
+    removeExistingPhotoOnSave,
+    setRemoveExistingPhotoOnSave,
     fieldErrors,
     submit,
     cancel,
@@ -170,12 +170,11 @@ export default function PetForm() {
             <h2 className="text-lg font-bold text-slate-900">Foto</h2>
             <PhotoUploader
               existingUrl={existingPhotoUrl}
-              existingId={existingPhotoId}
               file={photoFile}
               disabled={saving}
               onPick={onPickPhoto}
-              onRemoveRemote={mode === 'edit' ? removeExistingPhoto : undefined}
-              removingRemote={removingPhoto}
+              removeExisting={mode === 'edit' ? removeExistingPhotoOnSave : false}
+              onChangeRemoveExisting={mode === 'edit' ? setRemoveExistingPhotoOnSave : undefined}
             />
           </div>
 

@@ -52,8 +52,8 @@ export function usePetForm() {
     existingPhotoId: snap.existingPhotoId,
     photoFile: snap.photoFile,
     onPickPhoto: store.onPickPhoto,
-    removeExistingPhoto: store.removeExistingPhoto,
-    removingPhoto: snap.removingPhoto,
+    removeExistingPhotoOnSave: snap.removeExistingPhotoOnSave,
+    setRemoveExistingPhotoOnSave: store.setRemoveExistingPhotoOnSave,
 
     fieldErrors: snap.fieldErrors,
     submit: () => store.submit((path) => navigate(path)),
