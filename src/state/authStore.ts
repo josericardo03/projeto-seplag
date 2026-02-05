@@ -177,10 +177,10 @@ if (typeof window !== 'undefined') {
     syncFromStorage()
   })
 
-  window.addEventListener('storage', (e) => {
+  window.addEventListener('storage', (e: StorageEvent) => {
     if (!e.key) return
-    const keys = Object.values(TOKEN_STORAGE_KEYS)
-    if (keys.includes(e.key as any)) {
+    const keys: string[] = Object.values(TOKEN_STORAGE_KEYS)
+    if (keys.includes(e.key)) {
       syncFromStorage()
     }
   })
