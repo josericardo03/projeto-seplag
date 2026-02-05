@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PetsHeader } from '../../components/layout/PetsHeader'
 import { PetsListHero } from './components/list/PetsListHero'
@@ -14,6 +15,7 @@ import { usePetsList } from './hooks/usePetsList'
 
 export default function PetsList() {
   const navigate = useNavigate()
+  const [showFilters, setShowFilters] = useState(false)
 
   const {
     authLoading,
@@ -82,17 +84,33 @@ export default function PetsList() {
           </div>
         )}
 
-        <div className="mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 w-full mb-6 items-stretch sm:items-center">
           <SearchBar
             value={searchTerm}
             onChange={setSearchTerm}
             onSearch={search}
             onClear={clearSearch}
             disabled={loading}
+            className="flex-1 min-w-0"
+            showHint={false}
           />
+          <button
+            type="button"
+            onClick={() => setShowFilters((v) => !v)}
+            className="px-5 py-3.5 rounded-xl bg-white border border-stone-300 text-stone-700 text-sm font-semibold hover:bg-stone-50 transition-colors shrink-0 inline-flex items-center justify-center gap-2"
+            aria-expanded={showFilters}
+            aria-controls="filtros-panel"
+            id="filtros-btn"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filtros
+          </button>
         </div>
 
-        <section className="mb-6 rounded-2xl bg-white border border-stone-200/80 shadow-sm p-5 sm:p-6" aria-label="Filtros">
+        {showFilters && (
+        <section id="filtros-panel" className="mb-6 rounded-2xl bg-white border border-stone-200/80 shadow-sm p-5 sm:p-6" aria-label="Filtros" aria-labelledby="filtros-btn">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
             <h2 className="text-sm font-semibold text-stone-800 uppercase tracking-wide">Filtros</h2>
             <button
@@ -162,6 +180,7 @@ export default function PetsList() {
             </div>
           </div>
         </section>
+        )}
 
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <InlineCount total={totalElements} />

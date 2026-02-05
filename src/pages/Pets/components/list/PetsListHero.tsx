@@ -25,7 +25,7 @@ export function PetsListHero(props: {
               'px-6 py-3 rounded-xl text-sm font-semibold transition-colors',
               disabled
                 ? 'bg-stone-200 text-stone-500 cursor-not-allowed'
-                : 'bg-teal-600 text-white hover:bg-teal-700',
+                : 'bg-indigo-600 text-white hover:bg-indigo-700',
             ].join(' ')}
           >
             + Cadastrar Pet {disabled ? '(em breve)' : ''}
