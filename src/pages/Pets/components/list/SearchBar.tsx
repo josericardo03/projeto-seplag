@@ -31,7 +31,7 @@ export function SearchBar({ value, disabled, onChange, onSearch, onClear, classN
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="block w-full pl-11 pr-11 py-3.5 bg-white border border-stone-200 rounded-xl text-base text-stone-900 placeholder:text-stone-400 outline-none transition focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+            className="block w-full pl-11 pr-11 py-3.5 bg-white border border-stone-200 rounded-xl text-base text-stone-900 placeholder:text-stone-400 outline-none transition focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
           />
 
           {value.trim().length > 0 && (

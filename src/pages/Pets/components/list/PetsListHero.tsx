@@ -6,12 +6,12 @@ export function PetsListHero(props: {
   const { onAdd, onViewTutores, disabled } = props
   return (
     <div className="mb-8 flex flex-col gap-5">
-      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-        <div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-stone-800 tracking-tight mb-2">
+      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 rounded-2xl bg-gradient-to-r from-indigo-50 to-white border border-indigo-100/80 px-6 py-6 sm:px-8 sm:py-7">
+        <div className="border-l-4 border-indigo-500 pl-5">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-indigo-800 tracking-tight mb-2">
             Nossos Pets
           </h2>
-          <p className="text-stone-600 text-base sm:text-lg leading-relaxed max-w-xl">
+          <p className="text-indigo-700/80 text-base sm:text-lg leading-relaxed max-w-xl">
             Gerencie todos os seus amiguinhos em um só lugar
           </p>
         </div>

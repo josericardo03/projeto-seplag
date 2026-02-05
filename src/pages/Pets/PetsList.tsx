@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PetsHeader } from '../../components/layout/PetsHeader'
+import { Footer } from '../../components/layout/Footer'
 import { PetsListHero } from './components/list/PetsListHero'
 import { SearchBar } from './components/list/SearchBar'
 import { Pagination } from '../../components/Pagination'
@@ -52,13 +53,13 @@ export default function PetsList() {
   if (!isAuthenticated) return null
 
   const inputFocus =
-    'outline-none transition focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500 focus:bg-white'
+    'outline-none transition focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 focus:bg-white'
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="flex flex-col min-h-screen bg-stone-50">
       <PetsHeader />
 
-      <main id="main-content" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative z-10">
+      <main id="main-content" className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative z-10 w-full">
         {import.meta.env.DEV && (
           <DevStatusBar
             isAuthenticated={isAuthenticated}
@@ -209,6 +210,8 @@ export default function PetsList() {
 
         <Pagination currentPage={currentPage} totalPages={totalPages} onPage={goToPage} />
       </main>
+
+      <Footer />
     </div>
   )
 }

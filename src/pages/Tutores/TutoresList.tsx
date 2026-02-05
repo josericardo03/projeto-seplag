@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { PetsHeader } from '../../components/layout/PetsHeader'
+import { Footer } from '../../components/layout/Footer'
 import { FullPageSpinner } from '../../components/ui/PageStates'
 import { useTutoresList } from './hooks/useTutoresList'
 import { TutorCard } from './components/TutorCard'
@@ -197,6 +198,8 @@ export default function TutoresList() {
 
         <Pagination currentPage={currentPage} totalPages={totalPages} onPage={goToPage} />
       </main>
+
+      <Footer />
     </div>
   )
 }

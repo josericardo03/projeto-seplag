@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { PetsHeader } from '../../components/layout/PetsHeader'
+import { Footer } from '../../components/layout/Footer'
 import { FullPageAuthError, FullPageSpinner, RenderError } from '../../components/ui/PageStates'
 import { usePetForm } from './hooks/usePetForm'
 import { Field } from '../../components/ui/Field'
@@ -67,10 +68,10 @@ export default function PetForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-200">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-200">
       <PetsHeader />
 
-      <main id="main-content" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main id="main-content" className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
         <div className="mb-8">
           <Link to="/" className="inline-flex items-center text-sm text-slate-600 hover:text-indigo-600">
             ← Voltar
@@ -188,6 +189,8 @@ export default function PetForm() {
           />
         </div>
       </main>
+
+      <Footer />
     </div>
   )
 }

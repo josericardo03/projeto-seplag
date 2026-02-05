@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PetsHeader } from '../../components/layout/PetsHeader'
+import { Footer } from '../../components/layout/Footer'
 import { FullPageSpinner, RenderError } from '../../components/ui/PageStates'
 import { usePetDetails } from './hooks/usePetDetails'
 import { SpeciesBadge } from './components/details/SpeciesBadge'
@@ -38,10 +39,10 @@ export default function PetDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="flex flex-col min-h-screen bg-slate-100">
       <PetsHeader />
 
-      <main id="main-content" className="max-w-6xl mx-auto px-4 md:px-6 py-10">
+      <main id="main-content" className="flex-1 max-w-6xl mx-auto px-4 md:px-6 py-10 w-full">
         {deleteError && (
           <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm font-semibold">
             <span>Falha:</span>
@@ -109,6 +110,8 @@ export default function PetDetails() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   )
 }

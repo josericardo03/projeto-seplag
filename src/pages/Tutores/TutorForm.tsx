@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { PetsHeader } from '../../components/layout/PetsHeader'
+import { Footer } from '../../components/layout/Footer'
 import { FullPageSpinner, RenderError } from '../../components/ui/PageStates'
 import { Field } from '../../components/ui/Field'
 import { NumberLikeInput, TextInput } from '../../components/ui/Inputs'
@@ -231,6 +232,8 @@ export default function TutorForm() {
           />
         )}
       </main>
+
+      <Footer />
     </div>
   )
 }

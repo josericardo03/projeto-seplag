@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { PetsHeader } from '../../components/layout/PetsHeader'
+import { Footer } from '../../components/layout/Footer'
 
 function LobbyCard(props: { title: string; desc: string; to: string; cta: string; gradient: string }) {
   const { title, desc, to, cta, gradient } = props
@@ -24,10 +25,10 @@ function LobbyCard(props: { title: string; desc: string; to: string; cta: string
 
 export default function Lobby() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-200">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-200">
       <PetsHeader />
 
-      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main id="main-content" className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         <div className="mb-10">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
             Lobby
@@ -74,6 +75,8 @@ export default function Lobby() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   )
 }
