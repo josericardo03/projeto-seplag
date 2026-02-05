@@ -6,9 +6,6 @@ import { getErrorMessage } from '../utils/errors'
 
 type Mode = 'full' | 'soft'
 
-/** Quantidade de itens buscados da API para filtrar por nome (contém) no cliente */
-const SEARCH_FETCH_SIZE = 200
-
 export type PetsListState = {
   pets: Pet[]
   loading: boolean
@@ -17,8 +14,6 @@ export type PetsListState = {
 
   searchTerm: string
   appliedSearchTerm: string
-  /** Lista filtrada por nome (contém) no cliente; quando preenchida, paginação é em memória */
-  searchFilteredPets: Pet[] | null
 
   speciesFilter: string
   breedFilter: string
@@ -40,7 +35,6 @@ const initial: PetsListState = {
   error: null,
   searchTerm: '',
   appliedSearchTerm: '',
-  searchFilteredPets: null,
   speciesFilter: '',
   breedFilter: '',
   ageMinText: '',
@@ -68,30 +62,19 @@ function isAuthedReady() {
   return !!a.isAuthenticated && !a.isLoading
 }
 
-async function fetchPets(page: number, nome?: string, pageSizeOverride?: number) {
+async function fetchPets(page: number, nome?: string) {
   const s = subject.getValue()
-  const size = pageSizeOverride ?? s.pageSize
   const params: PetListParams = {
     page,
-    size,
+    size: s.pageSize,
     ...(nome && nome.trim() && { nome: nome.trim() }),
   }
   const response: PageableResponse<Pet> = await petService.getPets(params)
   return response
 }
 
-/** Filtra por nome contendo o termo (case insensitive) — ex.: "ico" encontra "Pitico" */
-function filterPetsByNameContains(pets: Pet[], term: string): Pet[] {
-  const t = term.trim().toLowerCase()
-  if (!t) return pets
-  return pets.filter((p) => (p.nome || '').toLowerCase().includes(t))
-}
-
 async function loadPage(page: number, mode: Mode = 'full') {
   const s = subject.getValue()
-  if (s.searchFilteredPets !== null) {
-    return
-  }
   const hasData = s.pets.length > 0
   const soft = mode === 'soft' && hasData
 
@@ -100,7 +83,7 @@ async function loadPage(page: number, mode: Mode = 'full') {
     if (soft) set({ refreshing: true })
     else set({ loading: true })
 
-    const response = await fetchPets(page, undefined)
+    const response = await fetchPets(page, s.appliedSearchTerm || undefined)
     const petsArray = response.content || []
     set({
       pets: petsArray,
@@ -122,30 +105,19 @@ async function loadPage(page: number, mode: Mode = 'full') {
 }
 
 async function search() {
-  const s = subject.getValue()
-  const term = s.searchTerm.trim()
-  set({ appliedSearchTerm: term, currentPage: 0, searchFilteredPets: null })
-  if (!term) {
-    await loadPage(0, 'full')
-    return
-  }
+  const term = subject.getValue().searchTerm.trim()
+  set({ appliedSearchTerm: term, currentPage: 0 })
   try {
     set({ loading: true, refreshing: false, error: null })
-    const response = await fetchPets(0, undefined, SEARCH_FETCH_SIZE)
-    const all = response.content || []
-    const filtered = filterPetsByNameContains(all, term)
-    const total = filtered.length
-    const totalPages = Math.max(1, Math.ceil(total / s.pageSize))
+    const response = await fetchPets(0, term || undefined)
     set({
-      searchFilteredPets: filtered,
-      pets: filtered.slice(0, s.pageSize),
-      totalPages,
-      totalElements: total,
-      currentPage: 0,
+      pets: response.content || [],
+      totalPages: response.totalPages || 0,
+      totalElements: response.totalElements || 0,
+      currentPage: response.number || 0,
     })
   } catch (e: unknown) {
     set({
-      searchFilteredPets: null,
       pets: [],
       totalPages: 0,
       totalElements: 0,
@@ -157,49 +129,12 @@ async function search() {
   }
 }
 
-async function refreshSearchResults() {
-  const s = subject.getValue()
-  const term = s.appliedSearchTerm?.trim()
-  if (!term || s.searchFilteredPets === null) return
-  try {
-    set({ error: null, refreshing: true })
-    const response = await fetchPets(0, undefined, SEARCH_FETCH_SIZE)
-    const all = response.content || []
-    const filtered = filterPetsByNameContains(all, term)
-    const total = filtered.length
-    const totalPages = Math.max(1, Math.ceil(total / s.pageSize))
-    const page = Math.min(s.currentPage, totalPages - 1)
-    const start = page * s.pageSize
-    set({
-      searchFilteredPets: filtered,
-      pets: filtered.slice(start, start + s.pageSize),
-      totalPages,
-      totalElements: total,
-      currentPage: page,
-      refreshing: false,
-    })
-  } catch (e: unknown) {
-    set({
-      refreshing: false,
-      error: getErrorMessage(e, 'Erro ao atualizar busca'),
-    })
-  }
-}
-
 async function clearSearch() {
-  set({ searchTerm: '', appliedSearchTerm: '', searchFilteredPets: null, currentPage: 0 })
+  set({ searchTerm: '', appliedSearchTerm: '', currentPage: 0 })
   await loadPage(0, 'full')
 }
 
 async function goToPage(page: number) {
-  const s = subject.getValue()
-  if (s.searchFilteredPets !== null) {
-    const start = page * s.pageSize
-    const pets = s.searchFilteredPets.slice(start, start + s.pageSize)
-    set({ pets, currentPage: page })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    return
-  }
   await loadPage(page, 'full')
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
@@ -215,12 +150,7 @@ function startPolling() {
   if (!s.pollingMs || s.pollingMs <= 0) return
   if (!visible) return
   pollId = window.setInterval(() => {
-    const state = subject.getValue()
-    if (state.appliedSearchTerm && state.searchFilteredPets !== null) {
-      void refreshSearchResults()
-    } else {
-      void loadPage(state.currentPage, 'soft')
-    }
+    void loadPage(subject.getValue().currentPage, 'soft')
   }, s.pollingMs)
 }
 
@@ -279,7 +209,6 @@ authStore.subject.subscribe((a) => {
       totalElements: 0,
       searchTerm: '',
       appliedSearchTerm: '',
-      searchFilteredPets: null,
       speciesFilter: '',
       breedFilter: '',
       ageMinText: '',
@@ -313,13 +242,6 @@ export const petsListStore = {
   search,
   clearSearch,
   goToPage,
-  reload: () => {
-    const s = subject.getValue()
-    if (s.appliedSearchTerm && s.searchFilteredPets !== null) {
-      void refreshSearchResults()
-    } else {
-      void loadPage(s.currentPage, 'full')
-    }
-  },
+  reload: () => loadPage(subject.getValue().currentPage, 'full'),
 } as const
 

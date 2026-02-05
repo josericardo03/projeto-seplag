@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Loading from './components/Loading'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { SkipLink } from './components/SkipLink'
 
 const PetsList = lazy(() => import('./pages/Pets/PetsList'))
 const PetDetails = lazy(() => import('./pages/Pets/PetDetails'))
@@ -14,6 +15,7 @@ const Lobby = lazy(() => import('./pages/Lobby/Lobby'))
 function App() {
   return (
     <div className="min-h-screen">
+      <SkipLink />
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route

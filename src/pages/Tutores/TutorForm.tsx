@@ -74,7 +74,7 @@ export default function TutorForm() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-200">
       <PetsHeader />
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <main id="main-content" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
         <div className="mb-2">
           <Link to="/tutores" className="inline-flex items-center text-sm text-slate-600 hover:text-indigo-600">
             ← Voltar

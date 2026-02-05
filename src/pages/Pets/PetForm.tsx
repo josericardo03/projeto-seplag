@@ -70,7 +70,7 @@ export default function PetForm() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-200">
       <PetsHeader />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <main id="main-content" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-8">
           <Link to="/" className="inline-flex items-center text-sm text-slate-600 hover:text-indigo-600">
             ← Voltar

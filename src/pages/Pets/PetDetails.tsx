@@ -41,7 +41,7 @@ export default function PetDetails() {
     <div className="min-h-screen bg-slate-100">
       <PetsHeader />
 
-      <main className="max-w-6xl mx-auto px-4 md:px-6 py-10">
+      <main id="main-content" className="max-w-6xl mx-auto px-4 md:px-6 py-10">
         {deleteError && (
           <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm font-semibold">
             <span>Falha:</span>

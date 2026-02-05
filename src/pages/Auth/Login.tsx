@@ -36,7 +36,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-200 flex items-center justify-center px-4">
+    <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-200 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white/80 backdrop-blur rounded-3xl shadow-2xl border border-black/5 p-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center text-white font-extrabold">
@@ -99,7 +99,7 @@ export default function Login() {
         </div>
 
       </div>
-    </div>
+    </main>
   )
 }
 
