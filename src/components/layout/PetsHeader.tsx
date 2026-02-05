@@ -20,7 +20,7 @@ export function PetsHeader() {
     <header className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 to-purple-700 shadow-lg border-b border-white/10 backdrop-blur">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <Link to="/" className="flex items-center gap-3 transition-transform hover:scale-[1.02] no-underline">
+          <Link to="/" className="flex items-center gap-3 transition-transform hover:scale-[1.02] no-underline" aria-label="PetManager - Ir para página inicial">
             <div className="w-12 h-12 rounded-xl bg-white/20 border border-white/20 flex items-center justify-center shadow">
               <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
                 {/* Patinha (paw) */}
@@ -39,7 +39,7 @@ export function PetsHeader() {
 
           {isAuthenticated ? (
             <div className="flex items-center gap-2 flex-wrap">
-              <nav className="flex items-center gap-1 p-1 rounded-2xl bg-white/10 border border-white/15">
+              <nav className="flex items-center gap-1 p-1 rounded-2xl bg-white/10 border border-white/15" aria-label="Navegação principal">
                 <NavLink to="/" className={() => navItem(isPetsActive)} aria-current={isPetsActive ? 'page' : undefined}>
                   Pets
                 </NavLink>
@@ -55,6 +55,7 @@ export function PetsHeader() {
                 type="button"
                 onClick={logout}
                 className={[navItemBase, 'bg-white/10 border border-white/20 text-white hover:bg-white/15'].join(' ')}
+                aria-label="Sair da conta"
               >
                 Sair
               </button>
