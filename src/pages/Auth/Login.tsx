@@ -1,12 +1,11 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { getErrorMessage } from '../../utils/errors'
 
 export default function Login() {
   const { isAuthenticated, isLoading, error, login } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')

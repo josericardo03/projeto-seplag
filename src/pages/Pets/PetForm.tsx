@@ -26,7 +26,6 @@ export default function PetForm() {
     raca,
     setRaca,
     existingPhotoUrl,
-    existingPhotoId,
     photoFile,
     onPickPhoto,
     removeExistingPhotoOnSave,
