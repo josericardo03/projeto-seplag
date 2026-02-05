@@ -3,6 +3,7 @@ import type { Pet, Tutor } from '../types'
 import { tutorService } from '../services/tutorService'
 import { petService } from '../services/petService'
 import { getErrorMessage } from '../utils/errors'
+import { formatCpfBR, formatPhoneBR, onlyDigits } from '../utils/masks'
 
 type Mode = 'create' | 'edit'
 
@@ -32,29 +33,6 @@ export type TutorFormState = {
   petsLoading: boolean
   petIdText: string
 }
-
-function onlyDigits(value: string) {
-  return value.replace(/[^\d]/g, '')
-}
-
-function formatPhoneBR(digits: string) {
-  const d = onlyDigits(digits).slice(0, 11)
-  if (d.length <= 2) return d
-  const ddd = d.slice(0, 2)
-  const rest = d.slice(2)
-  if (rest.length <= 4) return `(${ddd}) ${rest}`
-  if (rest.length <= 8) return `(${ddd}) ${rest.slice(0, 4)}-${rest.slice(4)}`
-  return `(${ddd}) ${rest.slice(0, 5)}-${rest.slice(5)}`
-}
-
-function formatCpfBR(value: string) {
-  const d = onlyDigits(value).slice(0, 11)
-  if (d.length <= 3) return d
-  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`
-  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
-  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`
-}
-
 function coerceTutorPhoto(tutor: Tutor): { id: number | null; url: string | null } {
   const foto = tutor.foto
   if (!foto) return { id: null, url: null }
@@ -149,12 +127,18 @@ export function createTutorFormStore() {
     const s = subject.getValue()
     const errs: Record<string, string> = {}
     if (!s.nome.trim()) errs.nome = 'Informe o nome completo'
-    if (!s.email.trim()) errs.email = 'Informe o email'
+
+    const phoneDigits = onlyDigits(s.telefone)
+    if (!phoneDigits) errs.telefone = 'Informe o telefone'
+    else if (phoneDigits.length < 10) errs.telefone = 'Telefone inválido'
+
+    if (!s.endereco.trim()) errs.endereco = 'Informe o endereço'
+
+    const emailTrim = s.email.trim()
+    if (emailTrim && !emailTrim.includes('@')) errs.email = 'Email inválido'
+
     const cpfDigits = onlyDigits(s.cpf)
-    if (!cpfDigits) errs.cpf = 'Informe o CPF'
-    else if (cpfDigits.length !== 11) errs.cpf = 'CPF inválido'
-    const digits = onlyDigits(s.telefone)
-    if (digits && digits.length < 10) errs.telefone = 'Telefone inválido'
+    if (cpfDigits && cpfDigits.length !== 11) errs.cpf = 'CPF inválido'
     set({ fieldErrors: errs })
     return Object.keys(errs).length === 0
   }
@@ -234,11 +218,15 @@ export function createTutorFormStore() {
 
     const payload: Omit<Tutor, 'id'> = {
       nome: s.nome.trim(),
-      email: s.email.trim(),
-      cpf: Number(onlyDigits(s.cpf)),
+      telefone: s.telefone.trim(),
+      endereco: s.endereco.trim(),
     }
-    if (s.telefone.trim()) payload.telefone = s.telefone.trim()
-    if (s.endereco.trim()) payload.endereco = s.endereco.trim()
+
+    const emailTrim = s.email.trim()
+    if (emailTrim) payload.email = emailTrim
+
+    const cpfDigits = onlyDigits(s.cpf)
+    if (cpfDigits) payload.cpf = Number(cpfDigits)
 
     try {
       set({ saving: true })

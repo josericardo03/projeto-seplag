@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { PetsHeader } from '../../components/layout/PetsHeader'
 import { FullPageSpinner, RenderError } from '../../components/ui/PageStates'
@@ -7,6 +8,7 @@ import { FormActions } from '../../components/ui/FormActions'
 import { useTutorForm } from './hooks/useTutorForm'
 import { TutorPhotoUploader } from './components/TutorPhotoUploader'
 import { TutorPetsLinker } from './components/TutorPetsLinker'
+import { cpfCaretFromDigitsCount, formatCpfBR, onlyDigits } from '../../utils/masks'
 
 export default function TutorForm() {
   const {
@@ -48,6 +50,8 @@ export default function TutorForm() {
     deleteTutor,
     cancel,
   } = useTutorForm()
+
+  const cpfRef = useRef<HTMLInputElement | null>(null)
 
   if (authLoading) return <FullPageSpinner label="Carregando..." />
   if (!isAuthenticated) return null
@@ -109,7 +113,7 @@ export default function TutorForm() {
               />
             </Field>
 
-            <Field label="Email" htmlFor="email" error={fieldErrors.email} hint="Obrigatório">
+            <Field label="Email" htmlFor="email" error={fieldErrors.email} hint="Opcional">
               <TextInput
                 id="email"
                 type="email"
@@ -121,17 +125,42 @@ export default function TutorForm() {
               />
             </Field>
 
-            <Field label="CPF" htmlFor="cpf" error={fieldErrors.cpf} hint="Obrigatório. Ex.: 123.456.789-01">
+            <Field label="CPF" htmlFor="cpf" error={fieldErrors.cpf} hint="Opcional. Ex.: 123.456.789-01">
               <NumberLikeInput
                 id="cpf"
+                ref={cpfRef}
                 value={cpf}
-                onChange={(e) => onChangeCpf(e.target.value)}
+                onChange={(e) => {
+                  const el = e.currentTarget
+                  const raw = el.value
+                  const selection = el.selectionStart ?? raw.length
+
+                  // Conta quantos dígitos existem antes do cursor na string "crua"
+                  const digitsBefore = onlyDigits(raw.slice(0, selection)).length
+
+                  onChangeCpf(raw)
+
+                  // Calcula onde o cursor deve ficar na string formatada
+                  const nextFormatted = formatCpfBR(raw)
+                  const nextCaret = Math.min(cpfCaretFromDigitsCount(digitsBefore), nextFormatted.length)
+
+                  // Após o React aplicar o novo value, restaurar o cursor
+                  window.requestAnimationFrame(() => {
+                    const input = cpfRef.current
+                    if (!input) return
+                    try {
+                      input.setSelectionRange(nextCaret, nextCaret)
+                    } catch {
+                      // Alguns ambientes podem não suportar setSelectionRange
+                    }
+                  })
+                }}
                 placeholder="000.000.000-00"
                 disabled={saving || linking}
               />
             </Field>
 
-            <Field label="Telefone" htmlFor="telefone" error={fieldErrors.telefone} hint="Opcional. Ex.: (11) 91234-5678">
+            <Field label="Telefone" htmlFor="telefone" error={fieldErrors.telefone} hint="Obrigatório. Ex.: (11) 91234-5678">
               <NumberLikeInput
                 id="telefone"
                 value={telefone}
@@ -142,7 +171,7 @@ export default function TutorForm() {
             </Field>
 
             <div className="sm:col-span-2">
-              <Field label="Endereço" htmlFor="endereco" hint="Opcional">
+              <Field label="Endereço" htmlFor="endereco" error={fieldErrors.endereco} hint="Obrigatório">
                 <TextInput
                   id="endereco"
                   value={endereco}
