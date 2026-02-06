@@ -19,19 +19,19 @@ export function PetCard({ pet }: { pet: Pet }) {
       to={`/pets/${pet.id}`}
       className="group block bg-white rounded-3xl shadow-md overflow-hidden cursor-pointer transition-all duration-300 border border-black/5 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl"
     >
-      <div className="relative h-56 bg-slate-100 overflow-hidden">
+      <div className="relative w-full aspect-[4/3] min-h-[180px] sm:min-h-[220px] bg-white overflow-hidden flex items-center justify-center">
         {hasImage ? (
           <img
             src={pet.foto!.url}
             alt={pet.nome}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            className="w-full h-full max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             onError={() => setImgError(true)}
           />
         ) : (
           <img
             src={placeholder}
             alt="Pet sem foto"
-            className="w-full h-full object-contain p-10 opacity-90"
+            className="w-full h-full max-w-full max-h-full object-contain p-8 sm:p-10 opacity-90"
           />
         )}
 
